@@ -7,8 +7,13 @@
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable-v24/home.xml" value="0.14635416666666667" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable-v24/info_toolbar.xml" value="0.14635416666666667" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable-v24/top_profile_background.xml" value="0.14635416666666667" />
+        <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_flag.xml" value="0.14635416666666667" />
+        <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_my_location.xml" value="0.14635416666666667" />
+        <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_start_sign.xml" value="0.14635416666666667" />
+        <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_waypoint.xml" value="0.14635416666666667" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/activity_main.xml" value="0.13020833333333334" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/fragment_finished_trips.xml" value="0.13020833333333334" />
+        <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/fragment_map.xml" value="0.13020833333333334" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/fragment_new_trip.xml" value="0.13020833333333334" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/fragment_planned_trips.xml" value="0.13020833333333334" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/fragment_start.xml" value="0.25" />
