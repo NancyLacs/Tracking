@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/help"
+        android:icon="@drawable/help"
+        app:showAsAction="ifRoom"
+        android:title="Hjelpeside" />
+
+
+    <item
+        android:id="@+id/welcomeFragment"
+        android:icon="@drawable/home"
+        app:showAsAction="ifRoom"
+        android:title="Startside" />
+
+
+    <item
+        android:id="@+id/info_toolbar"
+        android:icon="@drawable/info_toolbar"
+        app:showAsAction="ifRoom"
+        android:title="Info" />
+
+
+
+
+</menu>

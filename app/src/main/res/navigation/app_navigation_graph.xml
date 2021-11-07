@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/app_navigation_graph"
+    app:startDestination="@id/startFragment">
+
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="com.example.tracking.fragments.StartFragment"
+        android:label="fragment_start"
+        tools:layout="@layout/fragment_start">
+        <action
+            android:id="@+id/action_startFragment_to_finishedTripsFragment"
+            app:destination="@id/finishedTripsFragment" />
+        <action
+            android:id="@+id/action_startFragment_to_newTripFragment"
+            app:destination="@id/newTripFragment" />
+        <action
+            android:id="@+id/action_startFragment_to_plannedTripsFragment"
+            app:destination="@id/plannedTripsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.tracking.fragments.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" />
+    <fragment
+        android:id="@+id/newTripFragment"
+        android:name="com.example.tracking.fragments.NewTripFragment"
+        android:label="fragment_new_trip"
+        tools:layout="@layout/fragment_new_trip" />
+    <fragment
+        android:id="@+id/finishedTripsFragment"
+        android:name="com.example.tracking.fragments.FinishedTripsFragment"
+        android:label="fragment_finished_trips"
+        tools:layout="@layout/fragment_finished_trips" >
+        <action
+            android:id="@+id/action_finishedTripsFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/plannedTripsFragment"
+        android:name="com.example.tracking.fragments.PlannedTripsFragment"
+        android:label="fragment_planned_trips"
+        tools:layout="@layout/fragment_planned_trips" >
+        <action
+            android:id="@+id/action_plannedTripsFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+</navigation>

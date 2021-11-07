@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.NewTripFragment"
+    android:background="@color/lightBlue">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textSize="40sp"
+            android:text="New Trip"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="50dp"/>
+
+        <EditText
+            android:id="@+id/etTripName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:hint="Name of the trip"
+            android:layout_marginBottom="50dp"
+            android:textSize="25sp"
+            />
+
+        <CalendarView
+            android:id="@+id/cvTripDate"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"/>
+
+        <Button
+            android:id="@+id/btSaveNewTrip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Save"/>
+
+
+
+    </LinearLayout>
+
+</FrameLayout>
