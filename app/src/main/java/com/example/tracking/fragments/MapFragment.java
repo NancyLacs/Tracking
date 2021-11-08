@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.example.tracking.BuildConfig;
 import com.example.tracking.R;
+import com.example.tracking.viewmodel.TripViewModel;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -66,6 +67,13 @@ public class MapFragment extends Fragment {
     private boolean autoCentering = true;
     private boolean tracking = false;
 
+    private TripViewModel tripViewModel;
+
+    private long tripId;
+    private int tripStatus;
+
+
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -85,6 +93,8 @@ public class MapFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        tripId = MapFragmentArgs.fromBundle(getArguments()).getTripId();
+        tripStatus = MapFragmentArgs.fromBundle(getArguments()).getTripStatus();
         this.view = view;
         verifyPermissions();
     }
@@ -184,6 +194,7 @@ public class MapFragment extends Fragment {
         switch (requestCode) {
             case CALLBACK_ALL_PERMISSIONS:
                 if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(requireContext(), tripId + ": " + tripStatus, Toast.LENGTH_SHORT).show();
                     this.initMap(view);
                 }
                 return;

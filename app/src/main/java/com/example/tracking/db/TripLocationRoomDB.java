@@ -25,7 +25,7 @@ public abstract class TripLocationRoomDB extends RoomDatabase {
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
-    public static final String MY_DATE_FORMAT = "dd.MM.yyyy HH:mm";
+    public static final String MY_DATE_FORMAT = "dd.MM.yyyy";
     public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MY_DATE_FORMAT);
 
     public static TripLocationRoomDB getDatabase(final Context context){

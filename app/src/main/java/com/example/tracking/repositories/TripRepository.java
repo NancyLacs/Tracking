@@ -15,6 +15,7 @@ public class TripRepository {
 
     private TripLocationDAO tripLocationDAO;
     private int duration;
+    private long tripId;
 
 
     public TripRepository(Application application){
@@ -22,10 +23,11 @@ public class TripRepository {
         tripLocationDAO = db.tripLocationDAO();
     }
 
-    public void insert(Trip trip){
+    public long insert(Trip trip){
         TripLocationRoomDB.databaseWriteExecutor.execute(()->{
-            tripLocationDAO.insertTrip(trip);
+            tripId = tripLocationDAO.insertTrip(trip);
         });
+        return tripId;
     }
 
     public void insert(Location location){
@@ -88,6 +90,8 @@ public class TripRepository {
         return duration;
     }
 
-
+    public LiveData<Trip> getNewTrip(){
+        return tripLocationDAO.getNewTrip();
+    }
 
 }

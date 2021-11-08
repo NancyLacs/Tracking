@@ -21,8 +21,8 @@ public class TripViewModel extends AndroidViewModel {
         this.tripRepository = new TripRepository(application);
     }
 
-    public void insert(Trip trip){
-        tripRepository.insert(trip);
+    public long insert(Trip trip){
+        return tripRepository.insert(trip);
     }
 
     public void insert(Location location){
@@ -70,5 +70,9 @@ public class TripViewModel extends AndroidViewModel {
 
     public void updateDuration (long tripId, int duration){
         tripRepository.updateDuration(tripId, duration);
+    }
+
+    public LiveData<Trip> getNewTrip(){
+        return tripRepository.getNewTrip();
     }
 }

@@ -24,7 +24,16 @@
         android:id="@+id/mapFragment"
         android:name="com.example.tracking.fragments.MapFragment"
         android:label="fragment_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map" >
+        <argument
+            android:name="tripStatus"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="tripId"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </fragment>
     <fragment
         android:id="@+id/newTripFragment"
         android:name="com.example.tracking.fragments.NewTripFragment"

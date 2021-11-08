@@ -29,12 +29,15 @@ public interface TripLocationDAO {
     LiveData<Trip> getTripById(long tripId);
 
     //viser alle ferdige turer (u/ lokasjon)
-    @Query("SELECT * FROM Trip WHERE status = 1")
+    @Query("SELECT * FROM Trip WHERE status = 4")
     LiveData<List<Trip>> getAllFinishedTrips();
 
     //planlagte turer
-    @Query("SELECT * FROM Trip WHERE status = 0")
+    @Query("SELECT * FROM Trip WHERE status = 2")
     LiveData<List<Trip>> getPlannedTrips();
+
+    @Query("SELECT * FROM Trip WHERE status = 0 ORDER BY tripId DESC LIMIT 1")
+    LiveData<Trip> getNewTrip();
 
     //oppdaterer varighet
     @Query("UPDATE Trip SET duration = :duration WHERE tripId = :tripId")
