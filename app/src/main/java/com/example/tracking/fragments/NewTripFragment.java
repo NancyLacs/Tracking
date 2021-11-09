@@ -87,15 +87,15 @@ public class NewTripFragment extends Fragment {
             public void onClick(View view) {
                 tripName = etTripName.getText().toString();
                 if(!tripName.equals("") && date != null){
+                    //NewTripFragmentDirections.ActionNewTripFragmentToMapFragment action = NewTripFragmentDirections.actionNewTripFragmentToMapFragment();
                     String dateString = new SimpleDateFormat(MY_DATE_FORMAT).format(date.getTime());
                     Trip trip = new Trip(tripName, dateString);
                     long tripId = tripViewModel.insert(trip);
                     trip.status = 1; //under registering
                     tripViewModel.updateTrip(trip);
-                    NewTripFragmentDirections.ActionNewTripFragmentToMapFragment action = NewTripFragmentDirections.actionNewTripFragmentToMapFragment();
-                    action.setTripId(tripId);
-                    action.setTripStatus(1);
-                    navController.navigate(action);
+                    //action.setTripId(0);
+                    //action.setTripStatus(1);
+                    navController.navigate(R.id.mapFragment);
                 } else if(!tripName.equals("") && date == null){
                     Toast.makeText(requireContext(), "You must choose a date.", Toast.LENGTH_SHORT).show();
                 } else if(tripName.equals("") && date != null){

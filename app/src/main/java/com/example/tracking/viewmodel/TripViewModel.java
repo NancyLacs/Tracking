@@ -72,7 +72,23 @@ public class TripViewModel extends AndroidViewModel {
         tripRepository.updateDuration(tripId, duration);
     }
 
-    public LiveData<Trip> getNewTrip(){
+    public LiveData<List<Trip>> getNewTrip(){
         return tripRepository.getNewTrip();
+    }
+
+    public void addToLength(double distance, long tripId){
+        tripRepository.addToLength(distance, tripId);
+    }
+
+    public LiveData<List<Location>> getCurrentLocations (){
+        return tripRepository.getCurrentLocations();
+    }
+
+    public void deleteCurrentLocationsExceptLast() {
+        tripRepository.deleteCurrentLocationsExceptLast();
+    }
+
+    public void deleteTripsToBeRegistered(){
+        tripRepository.deleteTripsToBeRegistered();
     }
 }

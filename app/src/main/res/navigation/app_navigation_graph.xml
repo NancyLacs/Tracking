@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_startFragment_to_plannedTripsFragment"
             app:destination="@id/plannedTripsFragment" />
+        <action
+            android:id="@+id/action_startFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
     </fragment>
     <fragment
         android:id="@+id/mapFragment"

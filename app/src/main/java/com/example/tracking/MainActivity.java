@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -14,12 +16,17 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.example.tracking.viewmodel.TripViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
     static Context context;
     private MenuItem home;
     private boolean showHomeButton;
+    private TripViewModel tripViewModel;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHostFragment.getNavController();
+        navController = navHostFragment.getNavController();
 
         // *** NavigationUI & toolbar:
         // 1. Konfiguerer top app bar (sørger for tilbakeknapp, hamburgermeny osv.)
@@ -48,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });*/
+
+        tripViewModel = new ViewModelProvider(this).get(TripViewModel.class);
+        tripViewModel.deleteCurrentLocationsExceptLast();
 
     }
 
@@ -74,5 +84,20 @@ public class MainActivity extends AppCompatActivity {
         //home.setVisible(showHomeButton);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.logout_toolbar || id == R.id.info_toolbar ) {
+            if (id == R.id.logout_toolbar)
+                Toast.makeText(this, "You are exiting", Toast.LENGTH_SHORT).show();
+            if (id == R.id.info_toolbar)
+                Toast.makeText(this, "This is an app for tracking position and planning and saving trips.", Toast.LENGTH_SHORT).show();;
+        } else {
+            navController.navigate(R.id.startFragment);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
 }

@@ -36,8 +36,8 @@ public interface TripLocationDAO {
     @Query("SELECT * FROM Trip WHERE status = 2")
     LiveData<List<Trip>> getPlannedTrips();
 
-    @Query("SELECT * FROM Trip WHERE status = 0 ORDER BY tripId DESC LIMIT 1")
-    LiveData<Trip> getNewTrip();
+    @Query("SELECT * FROM Trip WHERE status = 1")
+    LiveData<List<Trip>> getNewTrip();
 
     //oppdaterer varighet
     @Query("UPDATE Trip SET duration = :duration WHERE tripId = :tripId")
@@ -48,8 +48,15 @@ public interface TripLocationDAO {
     int getDuration (long tripId);
 
     //oppdaterer lengde
-    @Query("UPDATE Trip SET length = :duration WHERE tripId = :tripId")
-    void updateLength (long tripId, double duration);
+    @Query("UPDATE Trip SET length = :distance WHERE tripId = :tripId")
+    void updateLength (long tripId, double distance);
+
+    //legger til lengde
+    @Query("UPDATE Trip SET length = :distance + length WHERE tripId = :tripId")
+    void addToLength (long tripId, double distance);
+
+    @Query("DELETE FROM Trip WHERE status = 1")
+    void deleteTripsToBeRegistered();
 
     //henter lengde
     @Query("SELECT length FROM Trip WHERE tripId = :tripId")
@@ -89,6 +96,10 @@ public interface TripLocationDAO {
     @Query("SELECT * FROM Location WHERE fk_trip = :tripId ORDER BY locationId ASC")
     LiveData<List<Location>> getLocationsForTrip (long tripId);
 
+    //sletter alle nåværende lokasjoner untatt siste
+    @Query("DELETE FROM Location WHERE fk_trip = 2 AND partOfTrip = 5 AND locationId NOT IN (SELECT locationId FROM Location WHERE fk_trip = 2 AND partOfTrip = 5 ORDER BY locationId DESC LIMIT 1)")
+    void deleteCurrentLocationsExceptLast();
 
-
+    @Query("SELECT * FROM Location WHERE fk_trip = 2 AND partOfTrip = 5 ORDER BY locationId")
+    LiveData<List<Location>> getCurrentLocations();
 }

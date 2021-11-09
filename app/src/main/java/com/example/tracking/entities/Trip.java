@@ -10,7 +10,7 @@ public class Trip {
     public long tripId;
     public String tripName;
     public String date;
-    public int status; //0= ny tur 1=under registrering 2=planlagt 3=pågående 4=ferdig
+    public int status; //0= ny tur 1=under registrering 2=planlagt 3=pågående 4=ferdig 5=current(henting av nåværende lokasjon)
     public double length;
     public int duration;
     public String startTime;

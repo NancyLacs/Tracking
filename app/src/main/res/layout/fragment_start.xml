@@ -44,7 +44,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="New Trip"
-            android:padding="15dp"
+            android:paddingHorizontal="35dp"
+            android:paddingVertical="15dp"
+            android:layout_marginBottom="30dp"/>
+
+        <Button
+            android:id="@+id/btMapFrag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Map"
+            android:paddingHorizontal="50dp"
+            android:paddingVertical="15dp"
             android:layout_marginBottom="30dp"/>
 
 

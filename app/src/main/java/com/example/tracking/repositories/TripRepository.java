@@ -90,8 +90,30 @@ public class TripRepository {
         return duration;
     }
 
-    public LiveData<Trip> getNewTrip(){
+    public LiveData<List<Trip>> getNewTrip(){
         return tripLocationDAO.getNewTrip();
+    }
+
+    public void addToLength(double distance, long tripId){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()->{
+            tripLocationDAO.addToLength(tripId, distance);
+        });
+    }
+
+    public void deleteCurrentLocationsExceptLast(){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()->{
+            tripLocationDAO.deleteCurrentLocationsExceptLast();
+        });
+    }
+
+    public LiveData<List<Location>> getCurrentLocations (){
+        return tripLocationDAO.getCurrentLocations();
+    }
+
+    public void deleteTripsToBeRegistered(){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()->{
+            tripLocationDAO.deleteTripsToBeRegistered();
+        });
     }
 
 }

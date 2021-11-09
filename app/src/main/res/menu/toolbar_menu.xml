@@ -2,12 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/help"
-        android:icon="@drawable/help"
-        app:showAsAction="ifRoom"
-        android:title="Hjelpeside" />
-
 
     <item
         android:id="@+id/welcomeFragment"
@@ -22,7 +16,11 @@
         app:showAsAction="ifRoom"
         android:title="Info" />
 
-
+    <item
+        android:id="@+id/logout_toolbar"
+        android:icon="@drawable/logout"
+        app:showAsAction="ifRoom"
+        android:title="Logg ut" />
 
 
 </menu>
