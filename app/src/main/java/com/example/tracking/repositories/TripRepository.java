@@ -90,7 +90,7 @@ public class TripRepository {
         return duration;
     }
 
-    public LiveData<List<Trip>> getNewTrip(){
+    public Trip getNewTrip(){
         return tripLocationDAO.getNewTrip();
     }
 

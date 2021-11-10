@@ -36,8 +36,8 @@ public interface TripLocationDAO {
     @Query("SELECT * FROM Trip WHERE status = 2")
     LiveData<List<Trip>> getPlannedTrips();
 
-    @Query("SELECT * FROM Trip WHERE status = 1")
-    LiveData<List<Trip>> getNewTrip();
+    @Query("SELECT * FROM Trip WHERE status = 0 ORDER BY tripId DESC LIMIT 1")
+    Trip getNewTrip();
 
     @Query("SELECT * FROM Trip WHERE tripName = :tripName AND date = :date")
     Trip getNewSpecificTrip(String tripName, String date);

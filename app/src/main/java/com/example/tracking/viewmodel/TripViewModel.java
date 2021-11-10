@@ -72,7 +72,7 @@ public class TripViewModel extends AndroidViewModel {
         tripRepository.updateDuration(tripId, duration);
     }
 
-    public LiveData<List<Trip>> getNewTrip(){
+    public Trip getNewTrip(){
         return tripRepository.getNewTrip();
     }
 

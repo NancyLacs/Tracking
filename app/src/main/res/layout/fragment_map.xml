@@ -12,6 +12,7 @@
         android:layout_height="650dp"
         android:layout_weight="1">
 
+
         <org.osmdroid.views.MapView
             android:id="@+id/map_view"
             android:layout_width="match_parent"
@@ -20,6 +21,16 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp" />
+
+        <TextView
+            android:id="@+id/tvTripNameMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:layout_margin="20dp"
+            android:textColor="@color/mainBlue"
+            android:layout_centerHorizontal="true"
+            />
 
         <LinearLayout
             android:id="@+id/llCentering"
@@ -39,7 +50,19 @@
                 android:background="@drawable/plus"
                 android:contentDescription="Play button"
                 android:layout_marginBottom="5dp"
+                android:visibility="gone"
                 />
+
+            <ImageView
+                android:id="@+id/btPlanRoute"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/map"
+                android:layout_marginBottom="5dp"
+                android:visibility="gone"
+                />
+
             <ImageView
                 android:id="@+id/playButton"
                 android:layout_width="40dp"
@@ -47,15 +70,18 @@
                 android:background="@drawable/play_icon"
                 android:contentDescription="Play button"
                 android:layout_marginBottom="5dp"
+                android:visibility="gone"
                 />
+
             <ImageView
                 android:id="@+id/stopButton"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/stop_icon"
                 android:contentDescription="Stop button"
-
+                android:visibility="gone"
                 />
+
             <ImageView
                 android:id="@+id/btCenter"
                 android:layout_width="40dp"
@@ -63,7 +89,6 @@
                 android:layout_marginBottom="5dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/currentpos"
-
                 />
 
             <ImageView
@@ -72,8 +97,9 @@
                 android:layout_height="40dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/route"
-
+                android:visibility="gone"
                 />
+
 
 
             <!--android:visibility="gone"-->
@@ -85,16 +111,6 @@
     </RelativeLayout>
 
 
-    <TextView
-        android:id="@+id/tvTripNameMap"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="Trip status:"
-        android:paddingHorizontal="10dp"
-        android:layout_marginBottom="10dp"
-        android:visibility="gone"
-        />
 
 
 

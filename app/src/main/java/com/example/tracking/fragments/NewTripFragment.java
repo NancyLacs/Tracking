@@ -36,7 +36,7 @@ public class NewTripFragment extends Fragment {
     private EditText etTripName;
     private CalendarView cvTripDate;
     private Calendar date = null;
-    public static final String MY_DATE_FORMAT = "dd.MM.yyyy";
+    private static final String MY_DATE_FORMAT = "dd.MM.yyyy";
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MY_DATE_FORMAT);
     private String selectedDate, tripName, newDate;
     private Trip trip;
