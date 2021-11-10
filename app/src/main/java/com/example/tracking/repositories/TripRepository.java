@@ -116,4 +116,9 @@ public class TripRepository {
         });
     }
 
+    public Trip getNewSpecificTrip(String tripName, String date){
+
+        return tripLocationDAO.getNewSpecificTrip(tripName, date);
+    }
+
 }

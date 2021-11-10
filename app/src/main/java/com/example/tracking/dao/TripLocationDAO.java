@@ -39,6 +39,9 @@ public interface TripLocationDAO {
     @Query("SELECT * FROM Trip WHERE status = 1")
     LiveData<List<Trip>> getNewTrip();
 
+    @Query("SELECT * FROM Trip WHERE tripName = :tripName AND date = :date")
+    Trip getNewSpecificTrip(String tripName, String date);
+
     //oppdaterer varighet
     @Query("UPDATE Trip SET duration = :duration WHERE tripId = :tripId")
     void updateDuration (long tripId, int duration);

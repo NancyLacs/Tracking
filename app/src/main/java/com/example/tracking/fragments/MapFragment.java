@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.preference.PreferenceManager;
 
 import android.os.Looper;
@@ -65,7 +67,11 @@ import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 public class MapFragment extends Fragment implements LocationListener {
 
@@ -114,7 +120,9 @@ public class MapFragment extends Fragment implements LocationListener {
 
     private LocationManager mLocationManager;
 
-    private ImageView btAutoCenter;
+    private ImageView btAutoCenter, btAdd;
+
+    private NavController navController;
 
     public MapFragment() {
         // Required empty public constructor
@@ -156,6 +164,8 @@ public class MapFragment extends Fragment implements LocationListener {
         //service = new Intent(requireActivity(), TripLocationService.class);
         tvTripNameMap = view.findViewById(R.id.tvTripNameMap);
         btAutoCenter = view.findViewById(R.id.btCenter);
+        btAdd = view.findViewById(R.id.addButton);
+
 
         //ordinary map
         if (tripId == 0 && tripStatus == 0){
@@ -189,6 +199,27 @@ public class MapFragment extends Fragment implements LocationListener {
             @Override
             public void onClick(View view) {
                 toggleCentering();
+            }
+        });
+
+        btAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SimpleDateFormat formatter= new SimpleDateFormat("dd.MM.yyyy");
+                Random random = new Random();
+                int randomInt = random.nextInt(100);
+                Date date = new Date(System.currentTimeMillis());
+                String now = formatter.format(date);
+                String name = "NEW-" + randomInt;
+                long inserted = tripViewModel.insert(new Trip(name, now));
+                Toast.makeText(requireContext(), "Inserted: "+ inserted, Toast.LENGTH_SHORT).show();
+                NavController navController = Navigation.findNavController(v);
+                MapFragmentDirections.ActionMapFragmentToNewTripFragment actionMapFragmentToNewTripFragment =
+                        MapFragmentDirections.actionMapFragmentToNewTripFragment();
+                actionMapFragmentToNewTripFragment.setNewTripName(name);
+                actionMapFragmentToNewTripFragment.setNewDate(now);
+                navController.navigate(actionMapFragmentToNewTripFragment);
             }
         });
         //updateCurrentLocation();

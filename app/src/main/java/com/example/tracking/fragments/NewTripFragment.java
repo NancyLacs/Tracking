@@ -38,8 +38,10 @@ public class NewTripFragment extends Fragment {
     private Calendar date = null;
     public static final String MY_DATE_FORMAT = "dd.MM.yyyy";
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MY_DATE_FORMAT);
-    private String selectedDate, tripName;
-    private NavController navController;
+    private String selectedDate, tripName, newDate;
+    private Trip trip;
+
+    //private NavController navController;
 
     public NewTripFragment() {
         // Required empty public constructor
@@ -64,8 +66,22 @@ public class NewTripFragment extends Fragment {
         btNewTrip = view.findViewById(R.id.btSaveNewTrip);
         etTripName = view.findViewById(R.id.etTripName);
         cvTripDate = view.findViewById(R.id.cvTripDate);
-        navController = Navigation.findNavController(view);
+        newDate = NewTripFragmentArgs.fromBundle(getArguments()).getNewDate();
+        tripName = NewTripFragmentArgs.fromBundle(getArguments()).getNewTripName();
+
+        //navController = Navigation.findNavController(view);
         tripViewModel = new ViewModelProvider(requireActivity()).get(TripViewModel.class);
+
+        /*tripViewModel.getNewSpecificTrip(tripName, newDate).observe(getViewLifecycleOwner(), trip ->{
+            this.trip = trip;
+        });*/
+
+        tripViewModel.getTripById(54).observe(getViewLifecycleOwner(), trip1 -> {
+            trip = trip1;
+        });
+
+        etTripName.setText(trip.tripName);
+
 
         cvTripDate.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -84,7 +100,7 @@ public class NewTripFragment extends Fragment {
 
         btNewTrip.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 tripName = etTripName.getText().toString();
                 if(!tripName.equals("") && date != null){
                     //NewTripFragmentDirections.ActionNewTripFragmentToMapFragment action = NewTripFragmentDirections.actionNewTripFragmentToMapFragment();
@@ -95,6 +111,7 @@ public class NewTripFragment extends Fragment {
                     tripViewModel.updateTrip(trip);
                     //action.setTripId(0);
                     //action.setTripStatus(1);
+                    NavController navController = Navigation.findNavController(v);
                     navController.navigate(R.id.mapFragment);
                 } else if(!tripName.equals("") && date == null){
                     Toast.makeText(requireContext(), "You must choose a date.", Toast.LENGTH_SHORT).show();

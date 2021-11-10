@@ -91,4 +91,8 @@ public class TripViewModel extends AndroidViewModel {
     public void deleteTripsToBeRegistered(){
         tripRepository.deleteTripsToBeRegistered();
     }
+
+    public Trip getNewSpecificTrip(String name, String date){
+        return tripRepository.getNewSpecificTrip(name, date);
+    }
 }

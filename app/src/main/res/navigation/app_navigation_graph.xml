@@ -36,6 +36,9 @@
             android:name="tripId"
             app:argType="long"
             android:defaultValue="0L" />
+        <action
+            android:id="@+id/action_mapFragment_to_newTripFragment"
+            app:destination="@id/newTripFragment" />
     </fragment>
     <fragment
         android:id="@+id/newTripFragment"
@@ -45,6 +48,14 @@
         <action
             android:id="@+id/action_newTripFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
+        <argument
+            android:name="newTripName"
+            app:argType="string"
+            android:defaultValue="NEW" />
+        <argument
+            android:name="newDate"
+            app:argType="string"
+            android:defaultValue="00.00.0000" />
     </fragment>
     <fragment
         android:id="@+id/finishedTripsFragment"
