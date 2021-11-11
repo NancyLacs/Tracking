@@ -21,7 +21,6 @@ public class StartFragment extends Fragment {
 
     private Button btPlanned;
     private Button btFinished;
-    private Button btNewTrip;
     private Button btMapFrag;
     public StartFragment() {
         // Required empty public constructor
@@ -46,34 +45,32 @@ public class StartFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         btPlanned = view.findViewById(R.id.btPlanned);
         btFinished = view.findViewById(R.id.btFinished);
-        btNewTrip = view.findViewById(R.id.btNewTrip);
         btMapFrag = view.findViewById(R.id.btMapFrag);
-        NavController navController = Navigation.findNavController(view);
+       //NavController navController = Navigation.findNavController(view);
         btPlanned.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections action = StartFragmentDirections.actionStartFragmentToPlannedTripsFragment();
+                NavController navController = Navigation.findNavController(v);
+                StartFragmentDirections.ActionStartFragmentToPlannedTripsFragment action = StartFragmentDirections.actionStartFragmentToPlannedTripsFragment();
+                action.setTripStatus(1);
                 navController.navigate(action);
             }
         });
 
         btFinished.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                NavDirections action = StartFragmentDirections.actionStartFragmentToFinishedTripsFragment();
+            public void onClick(View v) {
+                NavController navController = Navigation.findNavController(v);
+                StartFragmentDirections.ActionStartFragmentToPlannedTripsFragment action = StartFragmentDirections.actionStartFragmentToPlannedTripsFragment();
+                action.setTripStatus(3);
                 navController.navigate(action);
             }
         });
-        btNewTrip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavDirections action = StartFragmentDirections.actionStartFragmentToNewTripFragment();
-                navController.navigate(action);
-            }
-        });
+
         btMapFrag.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
+                NavController navController = Navigation.findNavController(v);
                 NavDirections action = StartFragmentDirections.actionStartFragmentToMapFragment();
                 navController.navigate(action);
             }

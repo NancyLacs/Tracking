@@ -74,5 +74,9 @@
         <action
             android:id="@+id/action_plannedTripsFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
+        <argument
+            android:name="tripStatus"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
 </navigation>

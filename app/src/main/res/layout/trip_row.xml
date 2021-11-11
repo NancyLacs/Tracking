@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:id="@+id/sensor_box"
+    android:gravity="center_vertical"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tvTripNameInList"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="TRIP"
+            android:textSize="20sp"
+            android:textColor="@color/teal_700"
+            android:layout_weight="1"
+            android:paddingVertical="5dp"
+            />
+
+        <TextView
+            android:id="@+id/tvTripDate"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:text="DATE"
+            android:layout_weight="1"
+            android:paddingVertical="5dp"/>
+
+        <ImageView
+            android:id="@+id/ivDeleteTrip"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/delete"
+            />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#AAA"
+
+
+        />
+</LinearLayout>

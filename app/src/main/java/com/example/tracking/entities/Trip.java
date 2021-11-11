@@ -50,4 +50,12 @@ public class Trip {
     public void setDate(String date) {
         this.date = date;
     }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 }
