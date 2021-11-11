@@ -15,10 +15,20 @@ import java.util.List;
 public class TripViewModel extends AndroidViewModel {
 
     private final TripRepository tripRepository;
+    private final LiveData<Trip> newTrip;
+    private final LiveData<List<Trip>> plannedTrips;
+    private final LiveData<List<Trip>> finishedTrips;
+    private final LiveData<Trip> onGoingTrip;
+    private final LiveData<Trip> lastCreatedTrip;
 
     public TripViewModel(@NonNull Application application) {
         super(application);
         this.tripRepository = new TripRepository(application);
+        newTrip = tripRepository.getNewTrip();
+        plannedTrips = tripRepository.getPlannedTrips();
+        finishedTrips = tripRepository.getAllFinishedTrips();
+        onGoingTrip = tripRepository.getOnGoingTrip();
+        lastCreatedTrip = tripRepository.getLastCreatedTrip();
     }
 
     public long insert(Trip trip){
@@ -39,12 +49,20 @@ public class TripViewModel extends AndroidViewModel {
         tripRepository.updateTrip(trip);
     }
 
+    public LiveData<Trip> getOngoingTrip(){
+        return onGoingTrip;
+    }
+
+    public LiveData<Trip> getLastCreatedTrip(){
+        return lastCreatedTrip;
+    }
+
     public LiveData<List<Trip>> getAllFinishedTrips() {
-        return tripRepository.getAllFinishedTrips();
+        return finishedTrips;
     }
     public LiveData<List<Trip>> getPlannedTrips() {
 
-        return tripRepository.getPlannedTrips();
+        return plannedTrips;
     }
 
     public LiveData<Trip> getTripById(long tripId) {
@@ -72,8 +90,8 @@ public class TripViewModel extends AndroidViewModel {
         tripRepository.updateDuration(tripId, duration);
     }
 
-    public Trip getNewTrip(){
-        return tripRepository.getNewTrip();
+    public LiveData<Trip> getNewTrip(){
+        return newTrip;
     }
 
     public void addToLength(double distance, long tripId){

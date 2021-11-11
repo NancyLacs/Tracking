@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Trip.class, Location.class}, version = 1)
+@Database(entities = {Trip.class, Location.class}, version = 1, exportSchema = false)
 public abstract class TripLocationRoomDB extends RoomDatabase {
     public abstract TripLocationDAO tripLocationDAO();
     private static volatile TripLocationRoomDB INSTANCE;

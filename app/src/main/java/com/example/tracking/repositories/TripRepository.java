@@ -16,11 +16,20 @@ public class TripRepository {
     private TripLocationDAO tripLocationDAO;
     private int duration;
     private long tripId;
-
+    private LiveData<Trip> newTrip;
+    private LiveData<List<Trip>> plannedTrips;
+    private LiveData<List<Trip>> finishedTrips;
+    private LiveData<Trip> onGoingTrip;
+    private LiveData<Trip> lastCreatedTrip;
 
     public TripRepository(Application application){
         TripLocationRoomDB db = TripLocationRoomDB.getDatabase(application);
         tripLocationDAO = db.tripLocationDAO();
+        newTrip = tripLocationDAO.getNewTrip();
+        plannedTrips = tripLocationDAO.getPlannedTrips();
+        finishedTrips = tripLocationDAO.getAllFinishedTrips();
+        onGoingTrip = tripLocationDAO.getOngoingTrip();
+        lastCreatedTrip = tripLocationDAO.getLastCreatedTrip();
     }
 
     public long insert(Trip trip){
@@ -28,6 +37,10 @@ public class TripRepository {
             tripId = tripLocationDAO.insertTrip(trip);
         });
         return tripId;
+    }
+
+    public LiveData<Trip> getOnGoingTrip(){
+        return onGoingTrip;
     }
 
     public void insert(Location location){
@@ -49,7 +62,11 @@ public class TripRepository {
     }
 
     public LiveData<List<Trip>> getAllFinishedTrips() {
-        return tripLocationDAO.getAllFinishedTrips();
+        return finishedTrips;
+    }
+
+    public LiveData<Trip> getLastCreatedTrip() {
+        return lastCreatedTrip;
     }
 
     public LiveData<Trip> getTripById(long tripId) {
@@ -58,7 +75,7 @@ public class TripRepository {
 
     public LiveData<List<Trip>> getPlannedTrips() {
 
-        return tripLocationDAO.getPlannedTrips();
+        return plannedTrips;
     }
 
     public LiveData<List<Location>> getLocationsForTrip(long tripId){
@@ -90,8 +107,8 @@ public class TripRepository {
         return duration;
     }
 
-    public Trip getNewTrip(){
-        return tripLocationDAO.getNewTrip();
+    public LiveData<Trip> getNewTrip(){
+        return newTrip;
     }
 
     public void addToLength(double distance, long tripId){

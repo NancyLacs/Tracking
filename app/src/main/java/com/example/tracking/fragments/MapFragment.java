@@ -111,14 +111,16 @@ public class MapFragment extends Fragment implements LocationListener {
     private Polyline mPolyline;
     private Polyline plannedRoute;
     private int tapOnMapCount = 0;
+    boolean chosenStart = false; //for tapsingle....
+    boolean chosenEnd = false;
 
     private TripViewModel tripViewModel;
     //private Intent service;
     //private Location previousLocation = null;
 
     //From navigation fragment
-    private long tripId;
-    private int tripStatus;
+    private long tripIdFromNavigation;
+    private int tripStatusFromNavigation;
 
 
     private Trip trip;
@@ -133,7 +135,8 @@ public class MapFragment extends Fragment implements LocationListener {
     private boolean autoCentering = true; //slå av og på sentrering
     private boolean tracking = false; //
     private boolean planRoute = false;
-    private boolean trackDrawing = false;
+    private boolean registerMode = false;
+
 
     //Kontroller
     private ImageView btAutoCenter, btAdd, btPlay, btStop, btPlanRoute;
@@ -183,8 +186,8 @@ public class MapFragment extends Fragment implements LocationListener {
         //fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         this.view = view;
         dialogView = getLayoutInflater().inflate(R.layout.new_trip_dialog, null);
-        tripId = MapFragmentArgs.fromBundle(getArguments()).getTripId();
-        tripStatus = MapFragmentArgs.fromBundle(getArguments()).getTripStatus();
+        tripIdFromNavigation = MapFragmentArgs.fromBundle(getArguments()).getTripId();
+        tripStatusFromNavigation = MapFragmentArgs.fromBundle(getArguments()).getTripStatus();
         tripViewModel = new ViewModelProvider(requireActivity()).get(TripViewModel.class);
         //service = new Intent(requireActivity(), TripLocationService.class);
         tvTripNameMap = view.findViewById(R.id.tvTripNameMap);
@@ -196,18 +199,25 @@ public class MapFragment extends Fragment implements LocationListener {
         createDialogForNewTrip();
 
         //ordinary map, no planned trip, from startFragment
-        if (tripId == 0 && tripStatus == 0){
+        if (tripIdFromNavigation == 0 && tripStatusFromNavigation == 0){
+            tripViewModel.getLastCreatedTrip().observe(getViewLifecycleOwner(), new Observer<Trip>() {
+                @Override
+                public void onChanged(Trip t) {
+                    trip = t;
+                    Toast.makeText(requireContext(), trip.tripName, Toast.LENGTH_SHORT).show();
+                }
+            });
             tracking = false;
             btAdd.setVisibility(View.VISIBLE);
             btPlay.setVisibility(View.VISIBLE);
         }
 
         // Is trip planned, finished?
-        if(tripStatus > 0){
-            tripViewModel.getTripById(tripId).observe(getViewLifecycleOwner(), chosenTrip ->{
+        if(tripStatusFromNavigation > 0){
+            tripViewModel.getTripById(tripIdFromNavigation).observe(getViewLifecycleOwner(), chosenTrip ->{
                 this.trip = chosenTrip;
                 tripName = this.trip.tripName;
-                switch (tripStatus){
+                switch (tripStatusFromNavigation){
                     case 1:
                         tvTripNameMap.setText("Planned trip: " + tripName);
                         btPlay.setVisibility(View.VISIBLE);
@@ -254,10 +264,14 @@ public class MapFragment extends Fragment implements LocationListener {
                 }
                 if(trip == null || (trip != null && trip.status == 0)){
                     tracking = true;
-                } else if (trip!=null && trip.status == 1){
+                    Toast.makeText(requireContext(), "Your tracks are drawn but are not saved.", Toast.LENGTH_SHORT).show();
+                } else if (tripStatusFromNavigation == 0 && registerMode && trip.status == 1){
                     trip.status = 2;
+                    tvTripNameMap.setText("Tracking: " + trip.tripName);
                     tripViewModel.updateTrip(trip);
                     tracking = true;
+                    chosenStart = false;
+                    chosenEnd = false;
                 }
                 else {
                     tracking = false;
@@ -272,10 +286,16 @@ public class MapFragment extends Fragment implements LocationListener {
             public void onClick(View view) {
                 tracking = false;
                 Toast.makeText(requireContext(), "Tracking is ended.", Toast.LENGTH_SHORT).show();
-                if (trip == null){
+                btStop.setVisibility(View.GONE);
+                if (tripStatusFromNavigation==0 && !registerMode){
                     btPlay.setVisibility(View.VISIBLE);
-                    btStop.setVisibility(View.GONE);
                 }
+                if ((tripStatusFromNavigation==0 && trip.status == 2 && registerMode) || tripStatusFromNavigation == 1 && trip.status == 2){
+                    tvTripNameMap.setText(trip.tripName);
+                    trip.status = 3;
+                    tripViewModel.updateTrip(trip);
+                }
+
             }
         });
 
@@ -363,12 +383,12 @@ public class MapFragment extends Fragment implements LocationListener {
                 tripName = etTripNameDialog.getText().toString();
                 if(!tripName.equals("") && date != null){
                     String dateString = new SimpleDateFormat(MY_DATE_FORMAT).format(date.getTime());
-                    Trip newTrip = new Trip(tripName, dateString);
-                    tripId = tripViewModel.insert(newTrip);
-                    tvTripNameMap.setText(newTrip.tripName);
+                    Trip inputTrip = new Trip(tripName, dateString);
+                    tripViewModel.insert(inputTrip);
+                    tvTripNameMap.setText(inputTrip.tripName);
                     btAdd.setVisibility(View.GONE);
                     btPlanRoute.setVisibility(View.VISIBLE);
-                    trip = tripViewModel.getNewTrip();
+                    registerMode = true;
                     //btPlay.setVisibility(View.GONE);
                 } else if(!tripName.equals("") && date == null){
                     Toast.makeText(requireContext(), "You must choose a date.", Toast.LENGTH_SHORT).show();
@@ -477,23 +497,23 @@ public class MapFragment extends Fragment implements LocationListener {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
                 if (planRoute){
-                    if (tapOnMapCount == 0 && tripStatus == 0 && tripId == 0) {
+                    if (!chosenStart && !chosenEnd && tripStatusFromNavigation == 0 && tripIdFromNavigation == 0) {
                         startMarker.setPosition(geoPoint);
                         map_view.getOverlays().add(startMarker);
                         Location startLocation = new Location(geoPoint.getLatitude(), geoPoint.getLongitude(), geoPoint.getAltitude(), trip.tripId, 0);
                         tripViewModel.insert(startLocation);
                         tvTripNameMap.setText("LOCATE THE ENDPOINT for " + trip.tripName);
-                        tapOnMapCount++;
-                    } else if (tapOnMapCount == 1 && tripStatus == 0 && tripId == 0) {
+                        chosenStart = true;
+                    } else if (chosenStart && !chosenEnd && tripStatusFromNavigation == 0 && tripIdFromNavigation == 0) {
                         endMarker.setPosition(geoPoint);
                         map_view.getOverlays().add(endMarker);
                         Location endLocation = new Location(geoPoint.getLatitude(), geoPoint.getLongitude(), geoPoint.getAltitude(), trip.tripId, 2);
                         tripViewModel.insert(endLocation);
                         tvTripNameMap.setText("Locate waypoints or start tracking." + trip.tripName);
-                        tapOnMapCount++;
                         trip.status = 1;
                         tripViewModel.updateTrip(trip);
                         btPlay.setVisibility(View.VISIBLE);
+                        chosenEnd = true;
                     } else { //mellompunkter
                         Marker waypointsMarker = new Marker(map_view);
                         waypointsMarker.setPosition(geoPoint);
@@ -605,7 +625,7 @@ public class MapFragment extends Fragment implements LocationListener {
             if (tracking){
                 runTracking(gp);
                 if(trip!=null && trip.status == 2){
-                    tripViewModel.insert(new Location(location.getLatitude(), location.getLongitude(), location.getAltitude(), tripId, 3));
+                    tripViewModel.insert(new Location(location.getLatitude(), location.getLongitude(), location.getAltitude(), trip.tripId, 3));
                 }
             }
             if (autoCentering){

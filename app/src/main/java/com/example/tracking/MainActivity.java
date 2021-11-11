@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         tripViewModel = new ViewModelProvider(this).get(TripViewModel.class);
         tripViewModel.deleteCurrentLocationsExceptLast();
+        tripViewModel.deleteTripsToBeRegistered();
 
     }
 

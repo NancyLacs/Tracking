@@ -29,15 +29,21 @@ public interface TripLocationDAO {
     LiveData<Trip> getTripById(long tripId);
 
     //viser alle ferdige turer (u/ lokasjon)
-    @Query("SELECT * FROM Trip WHERE status = 4")
+    @Query("SELECT * FROM Trip WHERE status = 3")
     LiveData<List<Trip>> getAllFinishedTrips();
 
     //planlagte turer
-    @Query("SELECT * FROM Trip WHERE status = 2")
+    @Query("SELECT * FROM Trip WHERE status = 1")
     LiveData<List<Trip>> getPlannedTrips();
 
+    @Query("SELECT * FROM Trip WHERE status = 2")
+    LiveData<Trip> getOngoingTrip();
+
+    @Query("SELECT * FROM Trip ORDER BY tripId DESC LIMIT 1")
+    LiveData<Trip> getLastCreatedTrip();
+
     @Query("SELECT * FROM Trip WHERE status = 0 ORDER BY tripId DESC LIMIT 1")
-    Trip getNewTrip();
+    LiveData<Trip> getNewTrip();
 
     @Query("SELECT * FROM Trip WHERE tripName = :tripName AND date = :date")
     Trip getNewSpecificTrip(String tripName, String date);
@@ -58,7 +64,7 @@ public interface TripLocationDAO {
     @Query("UPDATE Trip SET length = :distance + length WHERE tripId = :tripId")
     void addToLength (long tripId, double distance);
 
-    @Query("DELETE FROM Trip WHERE status = 1")
+    @Query("DELETE FROM Trip WHERE status = 0")
     void deleteTripsToBeRegistered();
 
     //henter lengde
