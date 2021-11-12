@@ -609,7 +609,6 @@ public class MapFragment extends Fragment implements LocationListener {
         super.onPause();
         if (tripStatusFromNavigation == 0 && trip != null && trip.status ==0 && startLocation!=null){
             tripViewModel.deleteLocationsForTrip(trip.tripId);
-            tripViewModel.deleteTrip(trip);
         }
         Log.d("CURRENT", "onPause");
         mLocationManager.removeUpdates(this);
