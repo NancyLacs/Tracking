@@ -31,8 +31,13 @@ public class TripsAdapter  extends RecyclerView.Adapter<TripsAdapter.TripViewHol
 
     @Override
     public void onBindViewHolder(@NonNull TripViewHolder holder, int position) {
+        if (trips.get(0).status == 1){
+            holder.tvTripDate.setText(trips.get(position).getDate());
+        } else {
+            holder.tvTripDate.setText(trips.get(position).endTime);
+        }
         holder.tvTripNameInList.setText(trips.get(position).getTripName());
-        holder.tvTripDate.setText(trips.get(position).getDate());
+
     }
 
     @Override

@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textSize="30sp"
+            android:textSize="25sp"
             android:text="Icon Explanation"
             android:layout_marginVertical="10dp"/>
 
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Plan new trip"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="To locate points on planning"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -87,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Start tracking / draw tracks"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -111,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Stop tracking / finish trip"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -137,7 +137,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Autocentering on/off"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -161,7 +161,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delete trip"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -185,7 +185,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Start point"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -210,7 +210,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Waypoint"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -234,8 +234,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Endpoint"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="5dp"
+            android:paddingHorizontal="10dp"
+            >
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/save"
+                android:layout_marginRight="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save as planned trip"
+                android:textSize="20sp"/>
         </LinearLayout>
 
 
@@ -251,7 +275,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="____"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:layout_marginRight="15dp"
                 android:textColor="@color/blue"/>
 
@@ -259,7 +283,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Planned route"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 
@@ -276,7 +300,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="____"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:layout_marginRight="15dp"
                 android:textColor="@color/red"/>
 
@@ -284,7 +308,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tracking line/Actual route"
-                android:textSize="25sp"/>
+                android:textSize="20sp"/>
 
         </LinearLayout>
 

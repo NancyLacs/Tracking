@@ -99,13 +99,19 @@
                 android:src="@drawable/route"
                 android:visibility="gone"
                 />
-
-
-
-            <!--android:visibility="gone"-->
-
-
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btSaveToPlanned"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/save"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="20dp"
+            android:visibility="gone"
+            />
 
 
     </RelativeLayout>
