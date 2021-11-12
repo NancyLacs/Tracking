@@ -45,7 +45,7 @@ public interface TripLocationDAO {
     @Query("SELECT * FROM Trip ORDER BY tripId DESC LIMIT 1")
     LiveData<Trip> getLastCreatedTrip();
 
-    @Query("SELECT * FROM Trip WHERE status = 0 ORDER BY tripId DESC LIMIT 1")
+    @Query("SELECT * FROM Trip ORDER BY tripId DESC LIMIT 1")
     LiveData<Trip> getNewTrip();
 
     @Query("SELECT * FROM Trip WHERE tripName = :tripName AND date = :date")

@@ -84,16 +84,11 @@ import java.util.Random;
 public class MapFragment extends Fragment implements LocationListener {
 
     private View view;
-    private static final int REQUEST_CHECK_SETTINGS = 10;
-    private static final int CALLBACK_ALL_PERMISSIONS = 1;
+
     //permissions til lokasjon
     private static String[] requiredLocationPermissions = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_WIFI_STATE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
             //Manifest.permission.FOREGROUND_SERVICE
     };
 
@@ -198,12 +193,12 @@ public class MapFragment extends Fragment implements LocationListener {
 
         //ordinary map, no planned trip, from startFragment
         if (tripIdFromNavigation == 0 && tripStatusFromNavigation == 0){
-            tripViewModel.getLastCreatedTrip().observe(getViewLifecycleOwner(), new Observer<Trip>() {
+            /*tripViewModel.getLastCreatedTrip().observe(getViewLifecycleOwner(), new Observer<Trip>() {
                 @Override
                 public void onChanged(Trip t) {
                     trip = t;
                 }
-            });
+            });*/
             tracking = false;
             btAdd.setVisibility(View.VISIBLE);
             btPlay.setVisibility(View.VISIBLE);
@@ -259,14 +254,20 @@ public class MapFragment extends Fragment implements LocationListener {
             @Override
             public void onClick(View view) {
                 btStop.setVisibility(View.VISIBLE);
-                if(tripStatusFromNavigation == 0 && trip.status == 0){
+                btPlanRoute.setVisibility(View.GONE);
+                btPlay.setVisibility(View.GONE);
+                if(tripStatusFromNavigation == 0 && !registerMode){
                     tracking = true;
                     Toast.makeText(requireContext(), "Your tracks are drawn but are not saved.", Toast.LENGTH_SHORT).show();
-                } else if ((tripStatusFromNavigation == 0 && registerMode && trip.status == 1) || tripStatusFromNavigation == 1){
-                    android.location.Location startLoc = new android.location.Location("startLoc");
-                    startLoc.setLatitude(startLocation.getLatitude());
-                    startLoc.setLongitude(startLocation.getLongitude());
-                    startLoc.setAltitude(startLocation.getAltitude());
+                } else if ((tripStatusFromNavigation == 0 && registerMode && trip.status == 1) ||
+                        (tripStatusFromNavigation == 0 && registerMode && trip.status == 0 )|| tripStatusFromNavigation == 1){
+                    if(startLocation != null){
+                        android.location.Location startLoc = new android.location.Location("startLoc");
+                        startLoc.setLatitude(startLocation.getLatitude());
+                        startLoc.setLongitude(startLocation.getLongitude());
+                        startLoc.setAltitude(startLocation.getAltitude());
+                    }
+
                     /*if(currentLocation.distanceTo(startLoc) > 100 ){
                         Toast.makeText(requireContext(), "You are far from the start point.", Toast.LENGTH_SHORT).show();
                         tracking = false;
@@ -275,7 +276,6 @@ public class MapFragment extends Fragment implements LocationListener {
                         String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(start);
                         trip.status = 2;
                         trip.startTime = dateString;
-                        trip.length = mPolyline.getDistance();
                         tvTripNameMap.setText("Tracking: " + trip.tripName);
                         tripViewModel.updateTrip(trip);
                         tracking = true;
@@ -286,8 +286,8 @@ public class MapFragment extends Fragment implements LocationListener {
                 else {
                     tracking = false;
                 }
-                
-                btPlay.setVisibility(View.GONE);
+
+
             }
         });
 
@@ -306,7 +306,12 @@ public class MapFragment extends Fragment implements LocationListener {
                     String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(end);
                     trip.status = 3;
                     trip.endTime = dateString;
+                    trip.length = mPolyline.getDistance();
                     tripViewModel.updateTrip(trip);
+                    NavController navController = Navigation.findNavController(view);
+                    MapFragmentDirections.ActionMapFragmentToPlannedTripsFragment action = MapFragmentDirections.actionMapFragmentToPlannedTripsFragment();
+                    action.setTripStatus(3);
+                    navController.navigate(action);
                 }
             }
         });
@@ -385,6 +390,9 @@ public class MapFragment extends Fragment implements LocationListener {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 tripName = etTripNameDialog.getText().toString();
+                tripViewModel.getNewTrip().observe(getViewLifecycleOwner(), newTrip ->{
+                    trip = newTrip;
+                });
                 if(!tripName.equals("") && date != null){
                     String dateString = new SimpleDateFormat(MY_DATE_FORMAT).format(date.getTime());
                     Trip inputTrip = new Trip(tripName, dateString);

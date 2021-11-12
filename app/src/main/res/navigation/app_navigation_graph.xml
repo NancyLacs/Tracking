@@ -11,9 +11,6 @@
         android:label="fragment_start"
         tools:layout="@layout/fragment_start">
         <action
-            android:id="@+id/action_startFragment_to_finishedTripsFragment"
-            app:destination="@id/finishedTripsFragment" />
-        <action
             android:id="@+id/action_startFragment_to_newTripFragment"
             app:destination="@id/newTripFragment" />
         <action
@@ -36,6 +33,9 @@
             android:name="tripId"
             app:argType="long"
             android:defaultValue="0L" />
+        <action
+            android:id="@+id/action_mapFragment_to_plannedTripsFragment"
+            app:destination="@id/plannedTripsFragment" />
     </fragment>
     <fragment
         android:id="@+id/newTripFragment"
