@@ -36,18 +36,12 @@
             android:name="tripId"
             app:argType="long"
             android:defaultValue="0L" />
-        <action
-            android:id="@+id/action_mapFragment_to_newTripFragment"
-            app:destination="@id/newTripFragment" />
     </fragment>
     <fragment
         android:id="@+id/newTripFragment"
         android:name="com.example.tracking.fragments.NewTripFragment"
         android:label="fragment_new_trip"
         tools:layout="@layout/fragment_new_trip" >
-        <action
-            android:id="@+id/action_newTripFragment_to_mapFragment"
-            app:destination="@id/mapFragment" />
         <argument
             android:name="newTripName"
             app:argType="string"
@@ -61,11 +55,7 @@
         android:id="@+id/finishedTripsFragment"
         android:name="com.example.tracking.fragments.FinishedTripsFragment"
         android:label="fragment_finished_trips"
-        tools:layout="@layout/fragment_finished_trips" >
-        <action
-            android:id="@+id/action_finishedTripsFragment_to_mapFragment"
-            app:destination="@id/mapFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_finished_trips" />
     <fragment
         android:id="@+id/plannedTripsFragment"
         android:name="com.example.tracking.fragments.PlannedTripsFragment"

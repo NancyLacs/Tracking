@@ -25,6 +25,9 @@ public interface TripLocationDAO {
     @Update
     void updateTrip(Trip trip);
 
+    @Query("DELETE FROM TRIP WHERE status = 2")
+    void deleteOngoingTrips();
+
     @Query("SELECT * FROM Trip WHERE tripId = :tripId")
     LiveData<Trip> getTripById(long tripId);
 
@@ -102,7 +105,7 @@ public interface TripLocationDAO {
     Location getLocationById (long locationId);
 
     //henter alle locations knyttet til en trip
-    @Query("SELECT * FROM Location WHERE fk_trip = :tripId ORDER BY locationId ASC")
+    @Query("SELECT * FROM Location WHERE fk_trip = :tripId ORDER BY partOfTrip ASC")
     LiveData<List<Location>> getLocationsForTrip (long tripId);
 
     //sletter alle nåværende lokasjoner untatt siste
@@ -111,4 +114,9 @@ public interface TripLocationDAO {
 
     @Query("SELECT * FROM Location WHERE fk_trip = 2 AND partOfTrip = 5 ORDER BY locationId")
     LiveData<List<Location>> getCurrentLocations();
+
+    @Query("SELECT * FROM Location WHERE partOfTrip = 0 AND fk_trip = :fk_trip")
+    LiveData<Location> getStartLocation(long fk_trip);
+
+
 }

@@ -110,25 +110,20 @@ public class MapFragment extends Fragment implements LocationListener {
     private ScaleBarOverlay mScaleBarOverlay;
     private Polyline mPolyline;
     private Polyline plannedRoute;
-    private int tapOnMapCount = 0;
     boolean chosenStart = false; //for tapsingle....
     boolean chosenEnd = false;
 
     private TripViewModel tripViewModel;
-    //private Intent service;
-    //private Location previousLocation = null;
+
 
     //From navigation fragment
     private long tripIdFromNavigation;
     private int tripStatusFromNavigation;
 
-
     private Trip trip;
     private String tripName;
 
     private boolean requestingLocationUpdates = false;
-    //private FusedLocationProviderClient fusedLocationClient;
-    //private LocationCallback locationCallback;
 
     //Lokalisering
     private LocationManager mLocationManager;
@@ -136,7 +131,11 @@ public class MapFragment extends Fragment implements LocationListener {
     private boolean tracking = false; //
     private boolean planRoute = false;
     private boolean registerMode = false;
+    private android.location.Location previousLocation;
+    private android.location.Location currentLocation;
 
+    //For planlagte turer
+    private Location startLocation;
 
     //Kontroller
     private ImageView btAutoCenter, btAdd, btPlay, btStop, btPlanRoute;
@@ -147,6 +146,7 @@ public class MapFragment extends Fragment implements LocationListener {
     private CalendarView cvTripDate;
     private View dialogView;
     private static final String MY_DATE_FORMAT = "dd.MM.yyyy";
+    private static final String START_END_DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MY_DATE_FORMAT);
     private String selectedDate;
     private Calendar date;
@@ -175,7 +175,6 @@ public class MapFragment extends Fragment implements LocationListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         Context ctx = requireActivity().getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         return inflater.inflate(R.layout.fragment_map, container, false);
@@ -183,13 +182,12 @@ public class MapFragment extends Fragment implements LocationListener {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        //fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
         this.view = view;
         dialogView = getLayoutInflater().inflate(R.layout.new_trip_dialog, null);
         tripIdFromNavigation = MapFragmentArgs.fromBundle(getArguments()).getTripId();
         tripStatusFromNavigation = MapFragmentArgs.fromBundle(getArguments()).getTripStatus();
         tripViewModel = new ViewModelProvider(requireActivity()).get(TripViewModel.class);
-        //service = new Intent(requireActivity(), TripLocationService.class);
         tvTripNameMap = view.findViewById(R.id.tvTripNameMap);
         btAutoCenter = view.findViewById(R.id.btCenter);
         btAdd = view.findViewById(R.id.addButton);
@@ -204,7 +202,6 @@ public class MapFragment extends Fragment implements LocationListener {
                 @Override
                 public void onChanged(Trip t) {
                     trip = t;
-                    Toast.makeText(requireContext(), trip.tripName, Toast.LENGTH_SHORT).show();
                 }
             });
             tracking = false;
@@ -216,16 +213,20 @@ public class MapFragment extends Fragment implements LocationListener {
         if(tripStatusFromNavigation > 0){
             tripViewModel.getTripById(tripIdFromNavigation).observe(getViewLifecycleOwner(), chosenTrip ->{
                 this.trip = chosenTrip;
-                tripName = this.trip.tripName;
-                switch (tripStatusFromNavigation){
-                    case 1:
-                        tvTripNameMap.setText("Planned trip: " + tripName);
-                        btPlay.setVisibility(View.VISIBLE);
-                        break;
-                    case 3:
-                        tvTripNameMap.setText("Finished trip:" + tripName);
-                        break;
+                tripName = chosenTrip.tripName;
+                if(tripStatusFromNavigation == 1){
+                    tvTripNameMap.setText("Planned trip: " + tripName);
+                    btPlay.setVisibility(View.VISIBLE);
                 }
+                if(tripStatusFromNavigation == 3){
+                    tvTripNameMap.setText("Finished trip: " + tripName);
+                }
+            });
+            tripViewModel.getStartLocation(tripIdFromNavigation).observe(getViewLifecycleOwner(), startLocation ->{
+                this.startLocation = startLocation;
+            });
+            tripViewModel.getLocationsForTrip(tripIdFromNavigation).observe(getViewLifecycleOwner(), locations -> {
+                drawTracks(locations);
             });
         }
 
@@ -236,7 +237,6 @@ public class MapFragment extends Fragment implements LocationListener {
             public void onClick(View view) {
                 planRoute = true;
                 tvTripNameMap.setText("Locate start point for " + trip.tripName);
-                btPlanRoute.setVisibility(View.GONE);
             }
         });
 
@@ -258,26 +258,36 @@ public class MapFragment extends Fragment implements LocationListener {
         btPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(planRoute){
-                    Toast.makeText(requireContext(), "End of planning, start of tracking", Toast.LENGTH_SHORT).show();
-                    planRoute = false;
-                }
-                if(trip == null || (trip != null && trip.status == 0)){
+                btStop.setVisibility(View.VISIBLE);
+                if(tripStatusFromNavigation == 0 && trip.status == 0){
                     tracking = true;
                     Toast.makeText(requireContext(), "Your tracks are drawn but are not saved.", Toast.LENGTH_SHORT).show();
-                } else if (tripStatusFromNavigation == 0 && registerMode && trip.status == 1){
-                    trip.status = 2;
-                    tvTripNameMap.setText("Tracking: " + trip.tripName);
-                    tripViewModel.updateTrip(trip);
-                    tracking = true;
-                    chosenStart = false;
-                    chosenEnd = false;
+                } else if ((tripStatusFromNavigation == 0 && registerMode && trip.status == 1) || tripStatusFromNavigation == 1){
+                    android.location.Location startLoc = new android.location.Location("startLoc");
+                    startLoc.setLatitude(startLocation.getLatitude());
+                    startLoc.setLongitude(startLocation.getLongitude());
+                    startLoc.setAltitude(startLocation.getAltitude());
+                    /*if(currentLocation.distanceTo(startLoc) > 100 ){
+                        Toast.makeText(requireContext(), "You are far from the start point.", Toast.LENGTH_SHORT).show();
+                        tracking = false;
+                    } else{*/
+                        Date start = new Date();
+                        String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(start);
+                        trip.status = 2;
+                        trip.startTime = dateString;
+                        trip.length = mPolyline.getDistance();
+                        tvTripNameMap.setText("Tracking: " + trip.tripName);
+                        tripViewModel.updateTrip(trip);
+                        tracking = true;
+                        chosenStart = false;
+                        chosenEnd = false;
+                    //}
                 }
                 else {
                     tracking = false;
                 }
+                
                 btPlay.setVisibility(View.GONE);
-                btStop.setVisibility(View.VISIBLE);
             }
         });
 
@@ -285,68 +295,62 @@ public class MapFragment extends Fragment implements LocationListener {
             @Override
             public void onClick(View view) {
                 tracking = false;
-                Toast.makeText(requireContext(), "Tracking is ended.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Tracking is stopped.", Toast.LENGTH_SHORT).show();
                 btStop.setVisibility(View.GONE);
                 if (tripStatusFromNavigation==0 && !registerMode){
                     btPlay.setVisibility(View.VISIBLE);
                 }
-                if ((tripStatusFromNavigation==0 && trip.status == 2 && registerMode) || tripStatusFromNavigation == 1 && trip.status == 2){
-                    tvTripNameMap.setText(trip.tripName);
+                else if (trip.status == 2 || tripStatusFromNavigation==1){
+                    tvTripNameMap.setText("Finished trip: " + tripName);
+                    Date end = new Date();
+                    String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(end);
                     trip.status = 3;
+                    trip.endTime = dateString;
                     tripViewModel.updateTrip(trip);
                 }
-
             }
         });
-
-
-
-        /*btAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                SimpleDateFormat formatter= new SimpleDateFormat("dd.MM.yyyy");
-                Random random = new Random();
-                int randomInt = random.nextInt(100);
-                Date date = new Date(System.currentTimeMillis());
-                String now = formatter.format(date);
-                String name = "NEW-" + randomInt;
-                long inserted = tripViewModel.insert(new Trip(name, now));
-                Toast.makeText(requireContext(), "Inserted: "+ inserted, Toast.LENGTH_SHORT).show();
-                NavController navController = Navigation.findNavController(v);
-                MapFragmentDirections.ActionMapFragmentToNewTripFragment actionMapFragmentToNewTripFragment =
-                        MapFragmentDirections.actionMapFragmentToNewTripFragment();
-                actionMapFragmentToNewTripFragment.setNewTripName(name);
-                actionMapFragmentToNewTripFragment.setNewDate(now);
-                navController.navigate(actionMapFragmentToNewTripFragment);
-            }
-        });*/
-        //updateCurrentLocation();
-
-
-        /*locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (android.location.Location location : locationResult.getLocations()) {
-                    // Update UI with location data
-                    // ...
-                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
-                    if (currentPositionMarker != null) {
-                        currentPositionMarker.setPosition(geoPoint);
-                        map_view.getOverlays().add(currentPositionMarker);
-                    }
-                    if (autoCentering){
-                        map_view.getController().setCenter(geoPoint);
-                    }
-
-                }
-            }
-        };*/
     }
 
+    public void drawTracks(List<Location> locations){
+        for(int i = 0; i < locations.size(); i++){
+            GeoPoint gp = new GeoPoint(locations.get(i).latitude, locations.get(i).longitude, locations.get(i).altitude);
+            if(locations.get(i).partOfTrip == 0 || locations.get(i).partOfTrip == 1 || locations.get(i).partOfTrip == 2){
+                if(locations.get(i).partOfTrip == 0){
+                    startMarker.setPosition(gp);
+                    map_view.getOverlays().add(startMarker);
+                } else if (locations.get(i).partOfTrip == 1){
+                    Marker waypointsMarker = new Marker(map_view);
+                    waypointsMarker.setPosition(gp);
+                    waypointsMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                    map_view.getOverlays().add(waypointsMarker);
+                    waypointsMarker.setIcon(getResources().getDrawable(R.drawable.ic_waypoint, null));
+                    waypointsMarker.setTitle("Waypoint");
+                } else {
+                    endMarker.setPosition(gp);
+                    map_view.getOverlays().add(endMarker);
+                }
+                if(!plannedRoute.getActualPoints().contains(gp)){
+                    plannedRoute.addPoint(gp);
+                }
+            }
+
+            if(locations.get(i).partOfTrip==3){
+                if (!mPolyline.getActualPoints().contains(gp)){
+                    if(i == locations.size()-1){
+                        Marker endMarkTracked = new Marker(map_view);
+                        endMarkTracked.setPosition(gp);
+                        endMarkTracked.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                        map_view.getOverlays().add(endMarkTracked);
+                        endMarkTracked.setIcon(getResources().getDrawable(R.drawable.ic_flag, null));
+                        endMarkTracked.setTitle("Actual endpoint.");
+                    }
+                    mPolyline.addPoint(gp);
+                }
+            }
+            map_view.invalidate();
+        }
+    }
 
     private void createDialogForNewTrip(){
         alertDialog = new AlertDialog.Builder(requireContext()).create();
@@ -482,28 +486,27 @@ public class MapFragment extends Fragment implements LocationListener {
         plannedRoute.getOutlinePaintLists().add(new MonochromaticPaintList(paint));
         map_view.getOverlays().add(plannedRoute);
 
-        /*if (tripId > 0) { //når man skal gå inn på kart tripId
-            chooseActionByStatus();
-        }*/
-        //initLocationUpdates();
-        //requireContext().startForegroundService(service);
-
         addSingleTapOnPlanning();
     }
-
 
     private void addSingleTapOnPlanning() {
         final MapEventsReceiver planMapReceiver = new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint geoPoint) {
                 if (planRoute){
+                    if(startMarker.isDisplayed()){
+                        chosenStart = true;
+                    }
+                    if(endMarker.isDisplayed()){
+                        chosenEnd = true;
+                    }
                     if (!chosenStart && !chosenEnd && tripStatusFromNavigation == 0 && tripIdFromNavigation == 0) {
                         startMarker.setPosition(geoPoint);
                         map_view.getOverlays().add(startMarker);
-                        Location startLocation = new Location(geoPoint.getLatitude(), geoPoint.getLongitude(), geoPoint.getAltitude(), trip.tripId, 0);
-                        tripViewModel.insert(startLocation);
+                        Location startLocation1 = new Location(geoPoint.getLatitude(), geoPoint.getLongitude(), geoPoint.getAltitude(), trip.tripId, 0);
+                        startLocation=startLocation1;
+                        tripViewModel.insert(startLocation1);
                         tvTripNameMap.setText("LOCATE THE ENDPOINT for " + trip.tripName);
-                        chosenStart = true;
                     } else if (chosenStart && !chosenEnd && tripStatusFromNavigation == 0 && tripIdFromNavigation == 0) {
                         endMarker.setPosition(geoPoint);
                         map_view.getOverlays().add(endMarker);
@@ -513,7 +516,6 @@ public class MapFragment extends Fragment implements LocationListener {
                         trip.status = 1;
                         tripViewModel.updateTrip(trip);
                         btPlay.setVisibility(View.VISIBLE);
-                        chosenEnd = true;
                     } else { //mellompunkter
                         Marker waypointsMarker = new Marker(map_view);
                         waypointsMarker.setPosition(geoPoint);
@@ -521,7 +523,7 @@ public class MapFragment extends Fragment implements LocationListener {
                         map_view.getOverlays().add(waypointsMarker);
                         waypointsMarker.setIcon(getResources().getDrawable(R.drawable.ic_waypoint, null));
                         waypointsMarker.setTitle("Waypoint");
-                        Location wayPoint = new Location(geoPoint.getLatitude(), geoPoint.getLongitude(), geoPoint.getAltitude(), trip.tripId, 2);
+                        Location wayPoint = new Location(geoPoint.getLatitude(), geoPoint.getLongitude(), geoPoint.getAltitude(), trip.tripId, 1);
                         tripViewModel.insert(wayPoint);
                     }
                 }
@@ -556,19 +558,15 @@ public class MapFragment extends Fragment implements LocationListener {
                                 Manifest.permission.ACCESS_FINE_LOCATION, false);
                         Boolean coarseLocationGranted = result.getOrDefault(
                                 Manifest.permission.ACCESS_COARSE_LOCATION,false);
-                        Boolean networkStateAccess = result.getOrDefault(Manifest.permission.ACCESS_NETWORK_STATE, false);
-                        Boolean wifiAccess = result.getOrDefault(Manifest.permission.ACCESS_WIFI_STATE, false);
-                        Boolean writeExternal = result.getOrDefault(Manifest.permission.WRITE_EXTERNAL_STORAGE, false);
-                        Boolean readExternal = result.getOrDefault(Manifest.permission.READ_EXTERNAL_STORAGE, false);
+                        //Boolean networkStateAccess = result.getOrDefault(Manifest.permission.ACCESS_NETWORK_STATE, false);
+                        //Boolean wifiAccess = result.getOrDefault(Manifest.permission.ACCESS_WIFI_STATE, false);
+                        //Boolean writeExternal = result.getOrDefault(Manifest.permission.WRITE_EXTERNAL_STORAGE, false);
+                        //Boolean readExternal = result.getOrDefault(Manifest.permission.READ_EXTERNAL_STORAGE, false);
                         if (fineLocationGranted != null && fineLocationGranted) {
                             // Precise location access granted.
                             requestingLocationUpdates = true;
-                            //initLocationUpdates();
-                            //requireContext().startForegroundService(service);
                             requestLocationUpdates();
                             initMap(view);
-                            //requireContext().startForegroundService(service);
-
                         } else if (coarseLocationGranted != null && coarseLocationGranted) {
                             // Only approximate location access granted.
                         } else {
@@ -610,13 +608,20 @@ public class MapFragment extends Fragment implements LocationListener {
         Log.d("CURRENT", "onPause");
         mLocationManager.removeUpdates(this);
         tripViewModel.deleteTripsToBeRegistered();
-        tripViewModel.deleteCurrentLocationsExceptLast();
+        tripViewModel.deleteOngoingTrips();
+
     }
 
     @Override
     public void onLocationChanged(@NonNull android.location.Location location) {
         if(requestingLocationUpdates){
             GeoPoint gp = new GeoPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
+            if(currentLocation== null){
+                previousLocation = location;
+            } else {
+                previousLocation = currentLocation;
+            }
+            currentLocation = location;
             if (currentPositionMarker != null) {
                 currentPositionMarker.setPosition(gp);
                 currentPositionMarker.setTitle(location.getLatitude() + ", " + location.getLongitude() + ", " + location.getAltitude());
@@ -655,129 +660,4 @@ public class MapFragment extends Fragment implements LocationListener {
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     }
 
-
-    /*private void updateCurrentLocation(){
-        Log.d("UPDATECURRENT", "Locationupdate");
-        tripViewModel.getCurrentLocations().observe(getViewLifecycleOwner(), currentLocations -> {
-            for (Location location : currentLocations){
-                if (previousLocation == null) {
-                    previousLocation = location;
-                }
-                previousLocation = location;
-                GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
-                if (currentPositionMarker != null) {
-                    currentPositionMarker.setPosition(geoPoint);
-                    map_view.getOverlays().add(currentPositionMarker);
-                }
-                if (autoCentering){
-                    map_view.getController().setCenter(geoPoint);
-                }
-            }
-        });
-    }*/
-
-
- /*@Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            //Kalles når bruker har akseptert og gitt tillatelse til bruk av posisjon:
-            case REQUEST_CHECK_SETTINGS:
-                Toast.makeText(requireActivity(), "INITLOCATIONS", Toast.LENGTH_SHORT).show();
-                initLocationUpdates();
-                return;
-        }
-    }*/
-    /*private void initLocationUpdates() {
-        Log.d("CURRENT", "initLOcationUpdates ");
-        final LocationRequest locationRequest = this.createLocationRequest();
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
-
-        // NB! Sjekker om kravene satt i locationRequest kan oppfylles:
-        SettingsClient client = LocationServices.getSettingsClient(requireContext());
-        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-        task.addOnSuccessListener(requireActivity(), new OnSuccessListener<LocationSettingsResponse>() {
-
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                // Alle lokasjopnsinnstillinger er OK, klienten kan nå initiere lokasjonsforespørsler her:
-                Log.d("CURRENT", "initLOcationUpdates2 ");
-                //startLocationUpdates(locationRequest);
-            }
-        });
-        task.addOnFailureListener(requireActivity(), new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                if (e instanceof ResolvableApiException) {
-                    // Lokasjopnsinnstillinger er IKKE OK, men det kan fikses ved å vise brukeren en dialog!!
-                    try {
-                        Log.d("CURRENT", "initLOcationUpdatesFailure try ");
-                        // Viser dialogen ved å kalle startResolutionForResult() OG SJEKKE resultatet i onActivityResult()
-                        ResolvableApiException resolvable = (ResolvableApiException) e;
-                        resolvable.startResolutionForResult(requireActivity(), REQUEST_CHECK_SETTINGS);
-                    } catch (IntentSender.SendIntentException sendEx) {
-                        // Ignore the error.
-                        Log.d("CURRENT", "initLOcationUpdates Failure catch");
-                    }
-                }
-            }
-        });
-        requireContext().startForegroundService(service);
-
-    }
-
-
-    //kalles av TripLocationService
-    public static LocationRequest createLocationRequest() {
-
-        LocationRequest locationRequest = LocationRequest.create();
-        // Hvor ofte ønskes lokasjonsoppdateringer (her: hvert 10.sekund)
-        locationRequest.setInterval(5 * 1000);
-        // Her settes intervallet for hvor raskt appen kan håndtere oppdateringer.
-        locationRequest.setFastestInterval(3 * 1000);
-        // Ulike verderi; Her: høyest mulig nøyaktighet som også normalt betyr bruk av GPS.
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        Log.d("CURRENT", "createLocationRequest");
-        return locationRequest;
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) requireActivity().getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.d("CURRENT", "serviceRunning");
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (requestingLocationUpdates) {
-            verifyPermissions();
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private void startLocationUpdates(LocationRequest locationRequest) {
-        fusedLocationClient.requestLocationUpdates(locationRequest,
-                locationCallback,
-                Looper.getMainLooper());
-    }
-
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        stopLocationUpdates();
-    }
-
-    private void stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback);
-    }*/
 }

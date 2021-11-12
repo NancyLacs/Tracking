@@ -138,4 +138,14 @@ public class TripRepository {
         return tripLocationDAO.getNewSpecificTrip(tripName, date);
     }
 
+    public void deleteOngoingTrips(){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()->{
+            tripLocationDAO.deleteOngoingTrips();
+        });
+    }
+
+    public LiveData<Location> getStartLocation(long fk_trip){
+        return tripLocationDAO.getStartLocation(fk_trip);
+    }
+
 }

@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             if (id == R.id.logout_toolbar)
                 Toast.makeText(this, "You are exiting", Toast.LENGTH_SHORT).show();
             if (id == R.id.info_toolbar)
-                Toast.makeText(this, "This is an app for tracking position and planning and saving trips.", Toast.LENGTH_SHORT).show();;
+                navController.navigate(R.id.newTripFragment);
         } else {
             navController.navigate(R.id.startFragment);
         }

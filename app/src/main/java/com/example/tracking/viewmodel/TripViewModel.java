@@ -113,4 +113,11 @@ public class TripViewModel extends AndroidViewModel {
     public Trip getNewSpecificTrip(String name, String date){
         return tripRepository.getNewSpecificTrip(name, date);
     }
+    public void deleteOngoingTrips(){
+        tripRepository.deleteOngoingTrips();
+    }
+
+    public LiveData<Location> getStartLocation(long fk_trip){
+        return tripRepository.getStartLocation(fk_trip);
+    }
 }
