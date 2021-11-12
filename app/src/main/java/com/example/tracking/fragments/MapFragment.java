@@ -177,7 +177,6 @@ public class MapFragment extends Fragment implements LocationListener {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         this.view = view;
         dialogView = getLayoutInflater().inflate(R.layout.new_trip_dialog, null);
         tripIdFromNavigation = MapFragmentArgs.fromBundle(getArguments()).getTripId();
@@ -189,8 +188,9 @@ public class MapFragment extends Fragment implements LocationListener {
         btPlay = view.findViewById(R.id.playButton);
         btStop = view.findViewById(R.id.stopButton);
         btPlanRoute = view.findViewById(R.id.btPlanRoute);
+        initMap(view);
+        verifyPermissions();
         createDialogForNewTrip();
-
         //ordinary map, no planned trip, from startFragment
         if (tripIdFromNavigation == 0 && tripStatusFromNavigation == 0){
             /*tripViewModel.getLastCreatedTrip().observe(getViewLifecycleOwner(), new Observer<Trip>() {
@@ -204,33 +204,12 @@ public class MapFragment extends Fragment implements LocationListener {
             btPlay.setVisibility(View.VISIBLE);
         }
 
-        // Is trip planned, finished?
-        if(tripStatusFromNavigation > 0){
-            tripViewModel.getTripById(tripIdFromNavigation).observe(getViewLifecycleOwner(), chosenTrip ->{
-                this.trip = chosenTrip;
-                tripName = chosenTrip.tripName;
-                if(tripStatusFromNavigation == 1){
-                    tvTripNameMap.setText("Planned trip: " + tripName);
-                    btPlay.setVisibility(View.VISIBLE);
-                }
-                if(tripStatusFromNavigation == 3){
-                    tvTripNameMap.setText("Finished trip: " + tripName);
-                }
-            });
-            tripViewModel.getStartLocation(tripIdFromNavigation).observe(getViewLifecycleOwner(), startLocation ->{
-                this.startLocation = startLocation;
-            });
-            tripViewModel.getLocationsForTrip(tripIdFromNavigation).observe(getViewLifecycleOwner(), locations -> {
-                drawTracks(locations);
-            });
-        }
-
-        verifyPermissions();
-
         btPlanRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 planRoute = true;
+                btPlanRoute.setVisibility(View.GONE);
+                btPlay.setVisibility(View.GONE);
                 tvTripNameMap.setText("Locate start point for " + trip.tripName);
             }
         });
@@ -254,7 +233,7 @@ public class MapFragment extends Fragment implements LocationListener {
             @Override
             public void onClick(View view) {
                 btStop.setVisibility(View.VISIBLE);
-                btPlanRoute.setVisibility(View.GONE);
+                //btPlanRoute.setVisibility(View.GONE);
                 btPlay.setVisibility(View.GONE);
                 if(tripStatusFromNavigation == 0 && !registerMode){
                     tracking = true;
@@ -315,6 +294,29 @@ public class MapFragment extends Fragment implements LocationListener {
                 }
             }
         });
+    }
+
+    private void initTripObserver(){
+        // Is trip planned, finished?
+        if(tripStatusFromNavigation > 0){
+            tripViewModel.getTripById(tripIdFromNavigation).observe(getViewLifecycleOwner(), chosenTrip ->{
+                this.trip = chosenTrip;
+                tripName = chosenTrip.tripName;
+                if(tripStatusFromNavigation == 1){
+                    tvTripNameMap.setText("Planned trip: " + tripName);
+                    btPlay.setVisibility(View.VISIBLE);
+                }
+                if(tripStatusFromNavigation == 3){
+                    tvTripNameMap.setText("Finished trip: " + tripName);
+                }
+            });
+            tripViewModel.getStartLocation(tripIdFromNavigation).observe(getViewLifecycleOwner(), startLocation ->{
+                this.startLocation = startLocation;
+            });
+            tripViewModel.getLocationsForTrip(tripIdFromNavigation).observe(getViewLifecycleOwner(), locations -> {
+                drawTracks(locations);
+            });
+        }
     }
 
     public void drawTracks(List<Location> locations){
@@ -566,15 +568,11 @@ public class MapFragment extends Fragment implements LocationListener {
                                 Manifest.permission.ACCESS_FINE_LOCATION, false);
                         Boolean coarseLocationGranted = result.getOrDefault(
                                 Manifest.permission.ACCESS_COARSE_LOCATION,false);
-                        //Boolean networkStateAccess = result.getOrDefault(Manifest.permission.ACCESS_NETWORK_STATE, false);
-                        //Boolean wifiAccess = result.getOrDefault(Manifest.permission.ACCESS_WIFI_STATE, false);
-                        //Boolean writeExternal = result.getOrDefault(Manifest.permission.WRITE_EXTERNAL_STORAGE, false);
-                        //Boolean readExternal = result.getOrDefault(Manifest.permission.READ_EXTERNAL_STORAGE, false);
                         if (fineLocationGranted != null && fineLocationGranted) {
                             // Precise location access granted.
                             requestingLocationUpdates = true;
                             requestLocationUpdates();
-                            initMap(view);
+                            initTripObserver();
                         } else if (coarseLocationGranted != null && coarseLocationGranted) {
                             // Only approximate location access granted.
                         } else {
@@ -600,24 +598,23 @@ public class MapFragment extends Fragment implements LocationListener {
             //requestPermissions(requiredLocationPermissions, CALLBACK_ALL_PERMISSIONS);
             locationPermissionRequest.launch(requiredLocationPermissions);
         } else {
-            //requireContext().startForegroundService(service);
             requestingLocationUpdates = true;
-            //initLocationUpdates();
             requestLocationUpdates();
-            initMap(view);
-
+            initTripObserver();
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
+        if (tripStatusFromNavigation == 0 && trip != null && trip.status ==0 && startLocation!=null){
+            tripViewModel.deleteLocationsForTrip(trip.tripId);
+            tripViewModel.deleteTrip(trip);
+        }
         Log.d("CURRENT", "onPause");
         mLocationManager.removeUpdates(this);
         tripViewModel.deleteTripsToBeRegistered();
         tripViewModel.deleteOngoingTrips();
-
     }
 
     @Override
