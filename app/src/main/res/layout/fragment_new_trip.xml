@@ -15,10 +15,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textSize="40sp"
+            android:textSize="30sp"
             android:text="Icon Explanation"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="50dp"/>
+            android:layout_marginVertical="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -240,7 +239,54 @@
         </LinearLayout>
 
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="5dp"
+            android:paddingHorizontal="10dp"
+            >
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="____"
+                android:textSize="25sp"
+                android:layout_marginRight="15dp"
+                android:textColor="@color/blue"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Planned route"
+                android:textSize="25sp"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="5dp"
+            android:paddingHorizontal="10dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="____"
+                android:textSize="25sp"
+                android:layout_marginRight="15dp"
+                android:textColor="@color/red"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tracking line/Actual route"
+                android:textSize="25sp"/>
+
+        </LinearLayout>
 
 
     </LinearLayout>
