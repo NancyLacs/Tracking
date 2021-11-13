@@ -227,11 +227,13 @@ public class MapFragment extends Fragment implements LocationListener {
         btPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btPlanRoute.setVisibility(View.GONE);
                 if(tripStatusFromNavigation == 0 && !registerMode){
                     tracking = true;
                     Toast.makeText(requireContext(), "Your tracks are drawn but are not saved.", Toast.LENGTH_SHORT).show();
                     btStop.setVisibility(View.VISIBLE);
                     btPlay.setVisibility(View.GONE);
+
                 } else if ((tripStatusFromNavigation == 0 && registerMode && trip.status == 1) ||
                         (tripStatusFromNavigation == 0 && registerMode && trip.status == 0 )|| tripStatusFromNavigation == 1){
                     if(startLocation != null){

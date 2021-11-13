@@ -28,8 +28,8 @@
             >
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:background="@drawable/plus"
                 android:contentDescription="Play button"
                 android:layout_marginRight="15dp"
@@ -52,8 +52,8 @@
             >
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/map"
                 android:layout_marginRight="15dp"
@@ -76,8 +76,8 @@
             >
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:background="@drawable/play_icon"
                 android:contentDescription="Play button"
                 android:layout_marginRight="15dp"
@@ -100,8 +100,8 @@
             >
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:background="@drawable/stop_icon"
                 android:contentDescription="Stop button"
                 android:layout_marginRight="15dp"
@@ -125,8 +125,8 @@
 
             <ImageView
                 android:layout_marginRight="15dp"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_marginBottom="5dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/currentpos"
@@ -150,8 +150,8 @@
             >
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/delete"
                 android:layout_marginRight="15dp"
@@ -174,8 +174,8 @@
             >
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_start_sign"
                 android:layout_marginRight="15dp"
@@ -199,8 +199,8 @@
 
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_waypoint"
                 android:layout_marginRight="15dp"
@@ -223,8 +223,8 @@
             >
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_flag"
                 android:layout_marginRight="15dp"
@@ -248,8 +248,8 @@
             >
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/save"
                 android:layout_marginRight="15dp"
@@ -259,6 +259,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Save as planned trip"
+                android:textSize="20sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="5dp"
+            android:paddingHorizontal="10dp"
+            >
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/currentpos"
+                android:layout_marginRight="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current position"
                 android:textSize="20sp"/>
         </LinearLayout>
 

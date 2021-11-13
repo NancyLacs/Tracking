@@ -52,11 +52,6 @@
             android:defaultValue="00.00.0000" />
     </fragment>
     <fragment
-        android:id="@+id/finishedTripsFragment"
-        android:name="com.example.tracking.fragments.FinishedTripsFragment"
-        android:label="fragment_finished_trips"
-        tools:layout="@layout/fragment_finished_trips" />
-    <fragment
         android:id="@+id/plannedTripsFragment"
         android:name="com.example.tracking.fragments.PlannedTripsFragment"
         android:label="fragment_planned_trips"
