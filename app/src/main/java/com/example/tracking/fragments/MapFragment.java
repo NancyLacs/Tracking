@@ -111,6 +111,8 @@ public class MapFragment extends Fragment implements LocationListener {
     private boolean registerMode = false;
     private android.location.Location previousLocation;
     private android.location.Location currentLocation;
+    private AlertDialog permissionDialog;
+    private boolean showMapOnly = false;
 
     //For planlagte turer
     private Location startLocation;
@@ -173,6 +175,7 @@ public class MapFragment extends Fragment implements LocationListener {
         btStop = view.findViewById(R.id.stopButton);
         btPlanRoute = view.findViewById(R.id.btPlanRoute);
         btSave = view.findViewById(R.id.btSaveToPlanned);
+        createDialogForLocationRequirement();
         initMap(view);
         verifyPermissions();
         createDialogForNewTrip();
@@ -575,10 +578,8 @@ public class MapFragment extends Fragment implements LocationListener {
                             requestingLocationUpdates = true;
                             requestLocationUpdates();
                             initTripObserver();
-                        } else if (coarseLocationGranted != null && coarseLocationGranted) {
-                            // Only approximate location access granted.
-                        } else {
-                            // No location access granted.
+                        }  else {
+                            showMapOnly = true;
                         }
                     }
             );
@@ -598,7 +599,15 @@ public class MapFragment extends Fragment implements LocationListener {
         // Kontrollerer om vi har tilgang til eksternt område:
         if (!hasPermissions(requiredLocationPermissions)) {
             //requestPermissions(requiredLocationPermissions, CALLBACK_ALL_PERMISSIONS);
-            locationPermissionRequest.launch(requiredLocationPermissions);
+            if(!showMapOnly){
+                permissionDialog.show();
+                //locationPermissionRequest.launch(requiredLocationPermissions);
+            } else {
+                Toast.makeText(requireContext(), "Location updates is off and Tracking will only show the map.", Toast.LENGTH_SHORT).show();
+                btAdd.setVisibility(View.GONE);
+                btAutoCenter.setVisibility(View.GONE);
+                btPlay.setVisibility(View.GONE);
+            }
         } else {
             requestingLocationUpdates = true;
             requestLocationUpdates();
@@ -647,6 +656,28 @@ public class MapFragment extends Fragment implements LocationListener {
             }
         }
     }
+
+    private void createDialogForLocationRequirement(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Location dependent application");
+        builder.setCancelable(false);
+        builder.setMessage("This application requires location updates to be able to show your position on the map and track your movement. " +
+                "You can still be able to show the map without the location updates.");
+
+        builder.setNegativeButton("Understood", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                locationPermissionRequest.launch(requiredLocationPermissions);
+            }
+        });
+
+       permissionDialog = builder.create();
+
+    }
+
+
+
+
+
 
     @Override
     public void onLocationChanged(@NonNull List<android.location.Location> locations) {
