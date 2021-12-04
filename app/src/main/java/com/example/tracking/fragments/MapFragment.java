@@ -101,6 +101,11 @@ public class MapFragment extends Fragment implements LocationListener {
     private Trip trip;
     private String tripName;
 
+    //Trip info dialog
+    private AlertDialog tripDialog;
+    private View tripDialogView;
+    private TextView tvTripDialogName, tvTripDialogStatus, tvTripDialogStart, tvTripDialogFinish, tvTripDialogDistance,
+            tvTripDialogDuration, tvTripDialogToughness, tvTripDialogPace, tvTripDialogPlanned;
     private boolean requestingLocationUpdates = false;
 
     //Lokalisering
@@ -119,7 +124,7 @@ public class MapFragment extends Fragment implements LocationListener {
     private float distanceToStartLoc;
 
     //Kontroller
-    private ImageView btAutoCenter, btAdd, btPlay, btStop, btPlanRoute, btSave;
+    private ImageView btAutoCenter, btAdd, btPlay, btStop, btPlanRoute, btSave, btInfo;
 
     //Dialog for ny tur
     private AlertDialog alertDialog;
@@ -165,6 +170,7 @@ public class MapFragment extends Fragment implements LocationListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         this.view = view;
         dialogView = getLayoutInflater().inflate(R.layout.new_trip_dialog, null);
+        tripDialogView = getLayoutInflater().inflate(R.layout.trip_detail_layout, null);
         tripIdFromNavigation = MapFragmentArgs.fromBundle(getArguments()).getTripId();
         tripStatusFromNavigation = MapFragmentArgs.fromBundle(getArguments()).getTripStatus();
         tripViewModel = new ViewModelProvider(requireActivity()).get(TripViewModel.class);
@@ -175,10 +181,13 @@ public class MapFragment extends Fragment implements LocationListener {
         btStop = view.findViewById(R.id.stopButton);
         btPlanRoute = view.findViewById(R.id.btPlanRoute);
         btSave = view.findViewById(R.id.btSaveToPlanned);
+        btInfo = view.findViewById(R.id.infoButton);
         createDialogForLocationRequirement();
+        createDialogForTripDetails();
         initMap(view);
         verifyPermissions();
         createDialogForNewTrip();
+
         //ordinary map, no planned trip, from startFragment
         if (tripIdFromNavigation == 0 && tripStatusFromNavigation == 0){
             /*tripViewModel.getLastCreatedTrip().observe(getViewLifecycleOwner(), new Observer<Trip>() {
@@ -298,6 +307,17 @@ public class MapFragment extends Fragment implements LocationListener {
                 }
             }
         });
+
+        btInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(trip!=null){
+                    tripDialog.show();
+                } else{
+                    Toast.makeText(requireContext(),"The trip detail is not yet ready.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void initTripObserver(){
@@ -306,6 +326,8 @@ public class MapFragment extends Fragment implements LocationListener {
             tripViewModel.getTripById(tripIdFromNavigation).observe(getViewLifecycleOwner(), chosenTrip ->{
                 this.trip = chosenTrip;
                 tripName = chosenTrip.tripName;
+                setTripDetails();
+                //btInfo.setVisibility(View.VISIBLE);
                 if(tripStatusFromNavigation == 1){
                     tvTripNameMap.setText("Planned trip: " + tripName);
                     btPlay.setVisibility(View.VISIBLE);
@@ -321,6 +343,19 @@ public class MapFragment extends Fragment implements LocationListener {
                 drawTracks(locations);
             });
         }
+    }
+
+    private void setTripDetails(){
+        tvTripDialogName.setText(trip.tripName);
+        tvTripDialogPlanned.setText(trip.date);
+        tvTripDialogStatus.setText(trip.status + "");
+        tvTripDialogStart.setText(trip.startTime);
+        tvTripDialogFinish.setText(trip.endTime);
+        tvTripDialogDistance.setText(trip.length + "");
+        tvTripDialogDuration.setText(trip.duration + "");
+        tvTripDialogToughness.setText(trip.toughness + "");
+        tvTripDialogPace.setText(trip.pace + "");
+        btInfo.setVisibility(View.VISIBLE);
     }
 
     public void drawTracks(List<Location> locations){
@@ -363,6 +398,28 @@ public class MapFragment extends Fragment implements LocationListener {
         }
     }
 
+    private void createDialogForTripDetails(){
+        tripDialog = new AlertDialog.Builder(requireContext()).create();
+        tripDialog.setCancelable(false);
+        tvTripDialogName = tripDialogView.findViewById(R.id.tvTripDetailName);
+        tvTripDialogStatus = tripDialogView.findViewById(R.id.tvTripDetailStatusValue);
+        tvTripDialogStart = tripDialogView.findViewById(R.id.tvTripDetailStartValue);
+        tvTripDialogFinish = tripDialogView.findViewById(R.id.tvTripDetailFinishValue);
+        tvTripDialogDistance = tripDialogView.findViewById(R.id.tvTripDetailLengthValue);
+        tvTripDialogDuration = tripDialogView.findViewById(R.id.tvTripDetailDurationValue);
+        tvTripDialogToughness = tripDialogView.findViewById(R.id.tvTripDetailToughnessValue);
+        tvTripDialogPace = tripDialogView.findViewById(R.id.tvTripDetailPaceValue);
+        tvTripDialogPlanned = tripDialogView.findViewById(R.id.tvTripDetailPlannedValue);
+
+        tripDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                tripDialog.dismiss();
+            }
+        });
+        tripDialog.setView(tripDialogView);
+    }
+
     private void createDialogForNewTrip(){
         alertDialog = new AlertDialog.Builder(requireContext()).create();
         alertDialog.setTitle("New Trip");
@@ -398,6 +455,8 @@ public class MapFragment extends Fragment implements LocationListener {
                 tripName = etTripNameDialog.getText().toString();
                 tripViewModel.getNewTrip().observe(getViewLifecycleOwner(), newTrip ->{
                     trip = newTrip;
+                    setTripDetails();
+                    //btInfo.setVisibility(View.VISIBLE);
                 });
                 if(!tripName.equals("") && date != null){
                     String dateString = new SimpleDateFormat(MY_DATE_FORMAT).format(date.getTime());

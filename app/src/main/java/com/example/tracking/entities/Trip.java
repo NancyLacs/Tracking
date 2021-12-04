@@ -15,6 +15,8 @@ public class Trip {
     public int duration;
     public String startTime;
     public String endTime;
+    public double toughness;
+    public double pace;
 
 
     public Trip(@NonNull String tripName, @NonNull String date) {
@@ -25,6 +27,8 @@ public class Trip {
         this.startTime = "";
         this.endTime = "";
         this.status = 0;
+        this.toughness = 0.0;
+        this.pace = 0.0;
     }
 
     public long getTripId() {

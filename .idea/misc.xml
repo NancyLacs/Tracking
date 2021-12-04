@@ -10,6 +10,7 @@
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_baseline_location_on_24.xml" value="0.190625" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_flag.xml" value="0.14635416666666667" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_my_location.xml" value="0.14635416666666667" />
+        <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_round_info_24.xml" value="0.146875" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_start_sign.xml" value="0.14635416666666667" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/drawable/ic_waypoint.xml" value="0.14635416666666667" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/activity_main.xml" value="0.13020833333333334" />
@@ -20,6 +21,7 @@
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/fragment_planned_trips.xml" value="0.13020833333333334" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/fragment_start.xml" value="0.25" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/new_trip_dialog.xml" value="0.18385416666666668" />
+        <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/trip_detail_layout.xml" value="0.13072916666666667" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/layout/trip_row.xml" value="0.21979166666666666" />
         <entry key="..\:/Users/nancy/AndroidStudioProjects/TaskExercises/Tracking/app/src/main/res/menu/toolbar_menu.xml" value="0.13020833333333334" />
       </map>
