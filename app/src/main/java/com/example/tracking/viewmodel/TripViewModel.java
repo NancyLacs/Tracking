@@ -81,7 +81,7 @@ public class TripViewModel extends AndroidViewModel {
         tripRepository.deleteLocationsForTrip(tripId);
     }
 
-    public int getDuration(long tripId){
+    public long getDuration(long tripId){
 
         return tripRepository.getDuration(tripId);
     }

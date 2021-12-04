@@ -63,6 +63,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class MapFragment extends Fragment implements LocationListener {
@@ -294,16 +295,25 @@ public class MapFragment extends Fragment implements LocationListener {
                 }
                 else if (trip.status == 2 || tripStatusFromNavigation==1){
                     tvTripNameMap.setText("Finished trip: " + tripName);
-                    Date end = new Date();
-                    String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(end);
-                    trip.status = 3;
-                    trip.endTime = dateString;
-                    trip.length = mPolyline.getDistance();
-                    tripViewModel.updateTrip(trip);
-                    NavController navController = Navigation.findNavController(view);
-                    MapFragmentDirections.ActionMapFragmentToPlannedTripsFragment action = MapFragmentDirections.actionMapFragmentToPlannedTripsFragment();
-                    action.setTripStatus(3);
-                    navController.navigate(action);
+                    try{
+                        Date start = convertStringToDate(trip.startTime);
+                        Date end = new Date();
+                        long msDifference = Math.abs(end.getTime()-start.getTime());
+                        long secDiff = TimeUnit.SECONDS.convert(msDifference, TimeUnit.MILLISECONDS);
+                        String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(end);
+                        trip.status = 3;
+                        trip.endTime = dateString;
+                        trip.length = mPolyline.getDistance(); //meter
+                        trip.duration = secDiff;
+                        trip.pace = trip.length/(double)secDiff; //m/s
+                        tripViewModel.updateTrip(trip);
+                        NavController navController = Navigation.findNavController(view);
+                        MapFragmentDirections.ActionMapFragmentToPlannedTripsFragment action = MapFragmentDirections.actionMapFragmentToPlannedTripsFragment();
+                        action.setTripStatus(3);
+                        navController.navigate(action);
+                    } catch(ParseException e){
+                        Toast.makeText(requireContext(), "ParseException: " + e, Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -318,6 +328,11 @@ public class MapFragment extends Fragment implements LocationListener {
                 }
             }
         });
+    }
+
+    private Date convertStringToDate(String dateString) throws ParseException {
+        Date date = simpleDateFormat.parse(dateString);
+        return date;
     }
 
     private void initTripObserver(){

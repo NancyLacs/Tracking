@@ -53,11 +53,11 @@ public interface TripLocationDAO {
 
     //oppdaterer varighet
     @Query("UPDATE Trip SET duration = :duration WHERE tripId = :tripId")
-    void updateDuration (long tripId, int duration);
+    void updateDuration (long tripId, long duration);
 
     //henter varighet
     @Query("SELECT duration FROM Trip WHERE tripId = :tripId")
-    int getDuration (long tripId);
+    long getDuration (long tripId);
 
     //oppdaterer lengde
     @Query("UPDATE Trip SET length = :distance WHERE tripId = :tripId")

@@ -14,7 +14,7 @@ import java.util.List;
 public class TripRepository {
 
     private TripLocationDAO tripLocationDAO;
-    private int duration;
+    private long duration;
     private long tripId;
     private LiveData<Trip> newTrip;
     private LiveData<List<Trip>> plannedTrips;
@@ -94,13 +94,13 @@ public class TripRepository {
         });
     }
 
-    public void updateDuration (long tripId, int duration){
+    public void updateDuration (long tripId, long duration){
         TripLocationRoomDB.databaseWriteExecutor.execute(()->{
             tripLocationDAO.updateDuration(tripId, duration);
         });
     }
 
-    public int getDuration (long tripId){
+    public long getDuration (long tripId){
         TripLocationRoomDB.databaseWriteExecutor.execute(()->{
             duration = tripLocationDAO.getDuration(tripId);
         });

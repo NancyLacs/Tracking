@@ -12,7 +12,7 @@ public class Trip {
     public String date;
     public int status; //0= ny tur 1=planlagt 2=pågående 3=ferdig 4=current(henting av nåværende lokasjon)
     public double length;
-    public int duration;
+    public long duration;
     public String startTime;
     public String endTime;
     public double toughness;
