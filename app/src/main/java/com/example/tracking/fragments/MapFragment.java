@@ -94,7 +94,6 @@ public class MapFragment extends Fragment implements LocationListener {
 
     private TripViewModel tripViewModel;
 
-
     //From navigation fragment
     private long tripIdFromNavigation;
     private int tripStatusFromNavigation;
@@ -137,6 +136,9 @@ public class MapFragment extends Fragment implements LocationListener {
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MY_DATE_FORMAT);
     private String selectedDate;
     private Calendar date;
+
+    //Sensor
+
 
     public MapFragment() {
         // Required empty public constructor
@@ -279,8 +281,6 @@ public class MapFragment extends Fragment implements LocationListener {
                     btStop.setVisibility(View.VISIBLE);
                     btPlay.setVisibility(View.GONE);
                 }
-
-
             }
         });
 
@@ -298,14 +298,22 @@ public class MapFragment extends Fragment implements LocationListener {
                     try{
                         Date start = convertStringToDate(trip.startTime);
                         Date end = new Date();
-                        long msDifference = Math.abs(end.getTime()-start.getTime());
-                        long secDiff = TimeUnit.MILLISECONDS.toSeconds(msDifference);
+                        Toast.makeText(requireContext(), end.getTime() + ", " + start.getTime(), Toast.LENGTH_SHORT).show();
+                        long msDifference = end.getTime()-start.getTime();
+                        long secDiff = (msDifference/1000)%60;
                         String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(end);
+                        double startAltitude = startLocation.altitude;
+                        double currentAltitude = currentLocation.getAltitude();
+                        double altitudeDiff = currentAltitude - startAltitude;
+                        double distance = mPolyline.getDistance();
+                        double toughness = Math.sqrt((altitudeDiff/3.281) * 2 * ((distance/1000)/1.609));
                         trip.status = 3;
                         trip.endTime = dateString;
-                        trip.length = mPolyline.getDistance(); //meter
+                        trip.length =  distance;//meter
                         trip.duration = secDiff;
                         trip.pace = trip.length/(double)secDiff; //m/s
+                        trip.elevation = altitudeDiff;
+                        trip.toughness = toughness;
                         tripViewModel.updateTrip(trip);
                         NavController navController = Navigation.findNavController(view);
                         MapFragmentDirections.ActionMapFragmentToPlannedTripsFragment action = MapFragmentDirections.actionMapFragmentToPlannedTripsFragment();
@@ -331,7 +339,7 @@ public class MapFragment extends Fragment implements LocationListener {
     }
 
     private Date convertStringToDate(String dateString) throws ParseException {
-        Date date = simpleDateFormat.parse(dateString);
+        Date date = new SimpleDateFormat(START_END_DATE_FORMAT).parse(dateString);
         return date;
     }
 
@@ -366,10 +374,10 @@ public class MapFragment extends Fragment implements LocationListener {
         tvTripDialogStatus.setText(trip.status + "");
         tvTripDialogStart.setText(trip.startTime);
         tvTripDialogFinish.setText(trip.endTime);
-        tvTripDialogDistance.setText(trip.length + "");
+        tvTripDialogDistance.setText(String.format("%,.2f km", trip.length/100));
         tvTripDialogDuration.setText(trip.duration + "");
-        tvTripDialogToughness.setText(trip.toughness + "");
-        tvTripDialogPace.setText(trip.pace + "");
+        tvTripDialogToughness.setText(trip.getToughnessInText());
+        tvTripDialogPace.setText(String.format("%,.2f m/s", trip.pace));
         btInfo.setVisibility(View.VISIBLE);
     }
 

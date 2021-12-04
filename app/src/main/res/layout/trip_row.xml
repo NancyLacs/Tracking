@@ -33,6 +33,13 @@
             android:text="DATE"
             android:layout_weight="1"
             android:paddingVertical="5dp"/>
+        <ImageView
+            android:id="@+id/ivTripInfo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_round_info_24"
+            />
 
         <ImageView
             android:id="@+id/ivDeleteTrip"

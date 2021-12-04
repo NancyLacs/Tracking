@@ -17,6 +17,7 @@ public class Trip {
     public String endTime;
     public double toughness;
     public double pace;
+    public double elevation;
 
 
     public Trip(@NonNull String tripName, @NonNull String date) {
@@ -29,6 +30,7 @@ public class Trip {
         this.status = 0;
         this.toughness = 0.0;
         this.pace = 0.0;
+        this.elevation = 0.0;
     }
 
     public long getTripId() {
@@ -63,6 +65,21 @@ public class Trip {
         this.status = status;
     }
 
+    public String getToughnessInText(){
+        String toughnessText = "";
+        if(toughness == 0){
+            toughnessText = "";
+        } else if (toughness < 50){
+            toughnessText = "Easiest";
+        } else if (toughness < 100){
+            toughnessText = "Moderate";
+        } else if (toughness < 150){
+            toughnessText = "Moderately Strenuous";
+        } else{
+            toughnessText = "Strenuous";
+        }
+        return toughnessText;
+    }
 
 
 }

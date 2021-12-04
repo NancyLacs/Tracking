@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.example.tracking.viewmodel.TripViewModel;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
 
     static Context context;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean showHomeButton;
     private TripViewModel tripViewModel;
     private NavController navController;
+    private final String PERSONFILE = "personFile.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,16 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         this.getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+         home = menu.findItem(R.id.welcomeFragment);
+        File file = new File(PERSONFILE);
+        if(file.exists()){
+            home.setVisible(true);
+            //Toast.makeText(this, "File exists.", Toast.LENGTH_SHORT).show();
+        } else {
+            home.setVisible(false);
+            //Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
+        }
+
         /*logout = menu.findItem(R.id.logout_toolbar);
         settings = menu.findItem(R.id.settings_toolbar);
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();

@@ -52,7 +52,7 @@ public class TripsAdapter  extends RecyclerView.Adapter<TripsAdapter.TripViewHol
     public class TripViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView tvTripNameInList;
         private TextView tvTripDate;
-        private ImageView ivTripDelete;
+        private ImageView ivTripDelete, ivTripInfo;
 
 
         public TripViewHolder(@NonNull View itemView) {
@@ -60,10 +60,11 @@ public class TripsAdapter  extends RecyclerView.Adapter<TripsAdapter.TripViewHol
             tvTripNameInList = itemView.findViewById(R.id.tvTripNameInList);
             tvTripDate = itemView.findViewById(R.id.tvTripDate);
             ivTripDelete = itemView.findViewById(R.id.ivDeleteTrip);
+            ivTripInfo = itemView.findViewById(R.id.ivTripInfo);
             tvTripDate.setOnClickListener(this::onClick);
             tvTripNameInList.setOnClickListener(this::onClick);
             ivTripDelete.setOnClickListener(this::onClick);
-
+            ivTripInfo.setOnClickListener(this::onClick);
         }
 
         @Override

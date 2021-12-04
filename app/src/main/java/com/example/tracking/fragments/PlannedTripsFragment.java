@@ -1,9 +1,11 @@
 package com.example.tracking.fragments;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 
 import com.example.tracking.R;
 import com.example.tracking.adapter.TripsAdapter;
+import com.example.tracking.entities.Trip;
 import com.example.tracking.viewmodel.TripViewModel;
 
 public class PlannedTripsFragment extends Fragment {
@@ -27,6 +30,10 @@ public class PlannedTripsFragment extends Fragment {
     private TripsAdapter tripsAdapter;
     private int tripStatusFromAction, tripStatusFromViewModel;
     private TextView tvTitle;
+    private AlertDialog tripDialog;
+    private View tripDialogView;
+    private TextView tvTripDialogName, tvTripDialogStatus, tvTripDialogStart, tvTripDialogFinish, tvTripDialogDistance,
+            tvTripDialogDuration, tvTripDialogToughness, tvTripDialogPace, tvTripDialogPlanned;
 
 
 
@@ -52,10 +59,11 @@ public class PlannedTripsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        //super.onViewCreated(view, savedInstanceState);
+        tripDialogView = getLayoutInflater().inflate(R.layout.trip_detail_layout, null);
         tvTitle = view.findViewById(R.id.tvPlannedTrips);
         rvTrip = view.findViewById(R.id.rvPlannedTrips);
-
+        createDialogForTripDetails();
         tripViewModel = new ViewModelProvider(requireActivity()).get(TripViewModel.class);
         tripStatusFromAction = PlannedTripsFragmentArgs.fromBundle(getArguments()).getTripStatus();
         if (tripStatusFromAction == 1){
@@ -79,6 +87,9 @@ public class PlannedTripsFragment extends Fragment {
                                 break;
                             case R.id.ivDeleteTrip:
                                 tripViewModel.deleteTrip(plannedTrips.get(position));
+                                break;
+                            case R.id.ivTripInfo:
+                                setTripDetails(plannedTrips.get(position));
                                 break;
                         }
                     }
@@ -107,10 +118,47 @@ public class PlannedTripsFragment extends Fragment {
                             case R.id.ivDeleteTrip:
                                 tripViewModel.deleteTrip(finishedTrips.get(position));
                                 break;
+                            case R.id.ivTripInfo:
+                                setTripDetails(finishedTrips.get(position));
+                                break;
                         }
                     }
                 });
             });
         }
+    }
+
+    private void createDialogForTripDetails(){
+        tripDialog = new AlertDialog.Builder(requireContext()).create();
+        tripDialog.setCancelable(false);
+        tvTripDialogName = tripDialogView.findViewById(R.id.tvTripDetailName);
+        tvTripDialogStatus = tripDialogView.findViewById(R.id.tvTripDetailStatusValue);
+        tvTripDialogStart = tripDialogView.findViewById(R.id.tvTripDetailStartValue);
+        tvTripDialogFinish = tripDialogView.findViewById(R.id.tvTripDetailFinishValue);
+        tvTripDialogDistance = tripDialogView.findViewById(R.id.tvTripDetailLengthValue);
+        tvTripDialogDuration = tripDialogView.findViewById(R.id.tvTripDetailDurationValue);
+        tvTripDialogToughness = tripDialogView.findViewById(R.id.tvTripDetailToughnessValue);
+        tvTripDialogPace = tripDialogView.findViewById(R.id.tvTripDetailPaceValue);
+        tvTripDialogPlanned = tripDialogView.findViewById(R.id.tvTripDetailPlannedValue);
+
+        tripDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                tripDialog.dismiss();
+            }
+        });
+        tripDialog.setView(tripDialogView);
+    }
+    private void setTripDetails(Trip trip){
+        tvTripDialogName.setText(trip.tripName);
+        tvTripDialogPlanned.setText(trip.date);
+        tvTripDialogStatus.setText(trip.status + "");
+        tvTripDialogStart.setText(trip.startTime);
+        tvTripDialogFinish.setText(trip.endTime);
+        tvTripDialogDistance.setText(String.format("%,.2f km", trip.length/100));
+        tvTripDialogDuration.setText(trip.duration + "");
+        tvTripDialogToughness.setText(trip.getToughnessInText());
+        tvTripDialogPace.setText(String.format("%,.2f m/s", trip.pace));
+        tripDialog.show();
     }
 }
