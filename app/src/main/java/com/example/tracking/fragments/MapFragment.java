@@ -299,7 +299,7 @@ public class MapFragment extends Fragment implements LocationListener {
                         Date start = convertStringToDate(trip.startTime);
                         Date end = new Date();
                         long msDifference = Math.abs(end.getTime()-start.getTime());
-                        long secDiff = TimeUnit.SECONDS.convert(msDifference, TimeUnit.MILLISECONDS);
+                        long secDiff = TimeUnit.MILLISECONDS.toSeconds(msDifference);
                         String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(end);
                         trip.status = 3;
                         trip.endTime = dateString;
