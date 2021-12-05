@@ -108,8 +108,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "You are exiting", Toast.LENGTH_SHORT).show();
             if (id == R.id.info_toolbar)
                 navController.navigate(R.id.newTripFragment);
-        } else {
+        } else if (id == R.id.welcomeFragment){
             navController.navigate(R.id.startFragment);
+        } else {
+            navController.navigate(R.id.personFragment);
         }
         return super.onOptionsItemSelected(item);
     }

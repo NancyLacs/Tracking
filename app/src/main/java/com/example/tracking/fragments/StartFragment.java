@@ -87,11 +87,12 @@ public class StartFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.toolbar_menu, menu);
         MenuItem home = menu.findItem(R.id.welcomeFragment);
-        String path = requireContext().getFilesDir().getAbsolutePath();
+        home.setVisible(false);
+        /*String path = requireContext().getFilesDir().getAbsolutePath();
         File file = new File(path, PERSONFILE);
         if(file.exists()){
             home.setVisible(true);
-        }
+        }*/
         super.onCreateOptionsMenu(menu, inflater);
     }
 }

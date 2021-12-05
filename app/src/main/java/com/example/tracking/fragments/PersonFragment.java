@@ -59,6 +59,7 @@ public class PersonFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -192,6 +193,11 @@ public class PersonFragment extends Fragment {
         savePersonData();
     }
 
-
-
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        MenuItem person= menu.findItem(R.id.profileFragment);
+        person.setVisible(false);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 }

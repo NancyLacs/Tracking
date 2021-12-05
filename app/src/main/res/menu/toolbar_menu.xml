@@ -2,12 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_baseline_person_24"
+        app:showAsAction="ifRoom"
+        android:title="Profile" />
 
     <item
         android:id="@+id/welcomeFragment"
         android:icon="@drawable/home"
         app:showAsAction="ifRoom"
-        android:title="Startside" />
+        android:title="Home" />
 
 
     <item
@@ -20,7 +25,7 @@
         android:id="@+id/logout_toolbar"
         android:icon="@drawable/logout"
         app:showAsAction="ifRoom"
-        android:title="Logg ut" />
+        android:title="Exit" />
 
 
 </menu>
