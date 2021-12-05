@@ -74,6 +74,20 @@ public interface TripLocationDAO {
     @Query("SELECT length FROM Trip WHERE tripId = :tripId")
     int getLength (long tripId);
 
+    //Total lengde
+    @Query("SELECT SUM(length) FROM Trip")
+    double getTotalLength();
+
+    @Query("SELECT AVG(length) FROM Trip")
+    double getAvgLength();
+
+    //Avg toughness
+    @Query("SELECT AVG(toughness) FROM Trip")
+    double getAvgToughness();
+
+    @Query("SELECT AVG(pace) FROM Trip")
+    double getAvgPace();
+
     //oppdaterer startDato
     @Query("UPDATE Trip SET startTime = :start WHERE tripId = :tripId")
     void updateStartTime (long tripId, String start);

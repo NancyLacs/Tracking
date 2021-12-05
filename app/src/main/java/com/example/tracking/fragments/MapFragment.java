@@ -38,6 +38,7 @@ import android.widget.Toast;
 //import com.example.tracking.BuildConfig;
 import com.example.tracking.R;
 import com.example.tracking.entities.Location;
+import com.example.tracking.entities.Person;
 import com.example.tracking.entities.Trip;
 
 import com.example.tracking.viewmodel.TripViewModel;
@@ -58,6 +59,13 @@ import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -69,6 +77,11 @@ import java.util.concurrent.TimeUnit;
 public class MapFragment extends Fragment implements LocationListener {
 
     private View view;
+
+    //Person
+    private Person user;
+    private File file;
+    private final String PERSON_FILE = "user.txt";
 
     //permissions til lokasjon
     private static String[] requiredLocationPermissions = {
@@ -190,6 +203,10 @@ public class MapFragment extends Fragment implements LocationListener {
         initMap(view);
         verifyPermissions();
         createDialogForNewTrip();
+        String path = requireContext().getFilesDir().getAbsolutePath();
+        file = new File(path, PERSON_FILE);
+        readPersonData();
+        Toast.makeText(requireContext(), user.getName(),Toast.LENGTH_SHORT).show();
 
         //ordinary map, no planned trip, from startFragment
         if (tripIdFromNavigation == 0 && tripStatusFromNavigation == 0){
@@ -755,6 +772,38 @@ public class MapFragment extends Fragment implements LocationListener {
        permissionDialog = builder.create();
 
     }
+
+    private void savePersonData(){
+        try{
+            FileOutputStream f = new FileOutputStream(file, false);
+            ObjectOutputStream o = new ObjectOutputStream(f);
+            o.writeObject(user);
+            o.close();
+            f.close();
+        } catch (FileNotFoundException e) {
+            Toast.makeText(requireContext(), "File not found", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(requireContext(), "Error initializing stream", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void readPersonData(){
+        try{
+            FileInputStream f = new FileInputStream(file);
+            ObjectInputStream o = new ObjectInputStream(f);
+            user = (Person) o.readObject();
+            //setPersonData();
+            o.close();
+            f.close();
+        } catch (FileNotFoundException e){
+            Toast.makeText(requireContext(), "File not found", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(requireContext(), "Error initializing stream", Toast.LENGTH_SHORT).show();
+        } catch (ClassNotFoundException e){
+            Toast.makeText(requireContext(), "Class not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 
 

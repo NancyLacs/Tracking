@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean showHomeButton;
     private TripViewModel tripViewModel;
     private NavController navController;
-    private final String PERSONFILE = "personFile.txt";
+    private final String PERSONFILE = "user.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         this.getMenuInflater().inflate(R.menu.toolbar_menu, menu);
          home = menu.findItem(R.id.welcomeFragment);
-        File file = new File(PERSONFILE);
+        String path = this.getFilesDir().getAbsolutePath();
+        File file = new File(path, PERSONFILE);
         if(file.exists()){
             home.setVisible(true);
             //Toast.makeText(this, "File exists.", Toast.LENGTH_SHORT).show();

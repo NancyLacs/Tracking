@@ -80,7 +80,8 @@ public class PersonFragment extends Fragment {
         etTotalToughness = view.findViewById(R.id.etProfileTotalToughness);
         etAvgPace = view.findViewById(R.id.etProfileAveragePace);
         etTotalPace = view.findViewById(R.id.etProfileTotalPace);
-        file = new File(PERSONFILE);
+        String path = requireContext().getFilesDir().getAbsolutePath();
+        file = new File(path, PERSONFILE);
         if(file.exists()){
             readPersonData();
             btnContinue.setVisibility(View.VISIBLE);

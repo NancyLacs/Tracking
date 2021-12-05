@@ -23,7 +23,7 @@ import java.io.File;
 
 
 public class StartFragment extends Fragment {
-
+    private final String PERSONFILE = "user.txt";
     private Button btPlanned;
     private Button btFinished;
     private Button btMapFrag;
@@ -36,6 +36,7 @@ public class StartFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
     }
 
@@ -86,7 +87,8 @@ public class StartFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.toolbar_menu, menu);
         MenuItem home = menu.findItem(R.id.welcomeFragment);
-        File file = new File("personFile.txt");
+        String path = requireContext().getFilesDir().getAbsolutePath();
+        File file = new File(path, PERSONFILE);
         if(file.exists()){
             home.setVisible(true);
         }
