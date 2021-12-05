@@ -10,6 +10,9 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,6 +23,12 @@ import com.example.tracking.R;
 import com.example.tracking.entities.Person;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,8 +37,13 @@ import java.io.File;
  */
 public class PersonFragment extends Fragment {
 
-    private final String PERSONFILE = "personFile.txt";
+    private final String PERSONFILE = "user.txt";
     private Person user;
+    private File file;
+    private Button btnSave, btnContinue;
+    private View btnSaveView;
+    private MenuItem home;
+    private EditText etName, etAge, etWeight, etDistance, etAvgToughness, etTotalToughness, etAvgPace, etTotalPace;
 
 
     public PersonFragment() {
@@ -56,18 +70,23 @@ public class PersonFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Button btnSave = view.findViewById(R.id.btProfileSave);
-        Button btnContinue = view.findViewById(R.id.btProfileContinue);
-        EditText etName = view.findViewById(R.id.etProfileName);
-        EditText etAge = view.findViewById(R.id.etProfileAge);
-        EditText etWeight = view.findViewById(R.id.etProfileWeight);
-        File file = new File(PERSONFILE);
+        btnSave = view.findViewById(R.id.btProfileSave);
+        btnContinue = view.findViewById(R.id.btProfileContinue);
+        etName = view.findViewById(R.id.etProfileName);
+        etAge = view.findViewById(R.id.etProfileAge);
+        etWeight = view.findViewById(R.id.etProfileWeight);
+        etDistance = view.findViewById(R.id.etProfileDistanceHiked);
+        etAvgToughness = view.findViewById(R.id.etProfileAverageToughness);
+        etTotalToughness = view.findViewById(R.id.etProfileTotalToughness);
+        etAvgPace = view.findViewById(R.id.etProfileAveragePace);
+        etTotalPace = view.findViewById(R.id.etProfileTotalPace);
+        file = new File(PERSONFILE);
         if(file.exists()){
+            readPersonData();
             btnContinue.setVisibility(View.VISIBLE);
-            //Toast.makeText(this, "File exists.", Toast.LENGTH_SHORT).show();
         } else {
             btnContinue.setVisibility(View.GONE);
-            //Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Please enter your profile information to continue.", Toast.LENGTH_SHORT).show();
         }
 
         btnContinue.setOnClickListener(new View.OnClickListener(){
@@ -80,7 +99,8 @@ public class PersonFragment extends Fragment {
         });
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
+                btnSaveView = v;
                 if(!file.exists()){
                     String name = etName.getText().toString();
                     String age = etAge.getText().toString();
@@ -88,19 +108,89 @@ public class PersonFragment extends Fragment {
                     if(name.equals("") || age.equals("")|| weight.equals("")){
                         Toast.makeText(requireContext(), "Please enter your profile information.", Toast.LENGTH_SHORT).show();
                     } else {
-                        //user = new Person(name, Integer.parseInt(age), Double.parseDouble(weight));
-                        //savePersonData();
-                        Toast.makeText(requireContext(), name + ", " + age + ", " + weight, Toast.LENGTH_SHORT).show();
-
+                        user = new Person(name, Integer.parseInt(age), Double.parseDouble(weight));
+                        try {
+                            if(file.createNewFile()){
+                                savePersonData();
+                            }
+                        } catch (IOException e) {
+                            Toast.makeText(requireContext(), "Error in creating file!", Toast.LENGTH_SHORT).show();
+                        }
+                        //Toast.makeText(requireContext(), name + ", " + age + ", " + weight, Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    updatePersonData();
                 }
 
             }
         });
     }
 
-    private void savePersonData(){
+    /*@Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        home = menu.findItem(R.id.welcomeFragment);
+        super.onCreateOptionsMenu(menu, inflater);
+    }*/
 
+    private void savePersonData(){
+        try{
+            FileOutputStream f = new FileOutputStream(file, false);
+            ObjectOutputStream o = new ObjectOutputStream(f);
+            o.writeObject(user);
+            o.close();
+            f.close();
+            /*NavController navController = Navigation.findNavController(btnSaveView);
+            NavDirections action = PersonFragmentDirections.actionPersonFragmentToStartFragment();
+            navController.navigate(action);*/
+            btnContinue.setVisibility(View.VISIBLE);
+        } catch (FileNotFoundException e) {
+            Toast.makeText(requireContext(), "File not found", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(requireContext(), "Error initializing stream", Toast.LENGTH_SHORT).show();
+        }
     }
+
+    private void readPersonData(){
+        try{
+            FileInputStream f = new FileInputStream(file);
+            ObjectInputStream o = new ObjectInputStream(f);
+            user = (Person) o.readObject();
+            setPersonData();
+            o.close();
+            f.close();
+        } catch (FileNotFoundException e){
+            Toast.makeText(requireContext(), "File not found", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(requireContext(), "Error initializing stream", Toast.LENGTH_SHORT).show();
+        } catch (ClassNotFoundException e){
+            Toast.makeText(requireContext(), "Class not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void setPersonData(){
+        etName.setText(user.getName());
+        etAge.setText(user.getAge() + "");
+        etWeight.setText(user.getWeight() +"");
+        etDistance.setText(user.getDistanceHiked() + "");
+        etAvgToughness.setText(user.getAverageToughness() + "");
+        etTotalToughness.setText(user.getTotalToughness() + "");
+        etAvgPace.setText(user.getAveragePace() + "");
+        etTotalPace.setText(user.getTotalPace() + "");
+    }
+
+    private void updatePersonData(){
+        user.setName(etName.getText().toString());
+        user.setAge(Integer.parseInt(etAge.getText().toString()));
+        user.setWeight(Double.parseDouble(etWeight.getText().toString()));
+        user.setDistanceHiked(Double.parseDouble(etDistance.getText().toString()));
+        user.setAverageToughness(Double.parseDouble(etAvgToughness.getText().toString()));
+        user.setTotalToughness(Double.parseDouble(etTotalToughness.getText().toString()));
+        user.setAveragePace(Double.parseDouble(etAvgPace.getText().toString()));
+        user.setTotalPace(Double.parseDouble(etTotalPace.getText().toString()));
+        savePersonData();
+    }
+
+
 
 }

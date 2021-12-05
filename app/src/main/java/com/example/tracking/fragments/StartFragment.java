@@ -10,11 +10,16 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.tracking.R;
+
+import java.io.File;
 
 
 public class StartFragment extends Fragment {
@@ -75,5 +80,16 @@ public class StartFragment extends Fragment {
                 navController.navigate(action);
             }
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        MenuItem home = menu.findItem(R.id.welcomeFragment);
+        File file = new File("personFile.txt");
+        if(file.exists()){
+            home.setVisible(true);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }
