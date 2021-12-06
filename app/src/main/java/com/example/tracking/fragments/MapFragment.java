@@ -83,6 +83,13 @@ public class MapFragment extends Fragment implements LocationListener {
     private Person user;
     private File file;
     private final String PERSON_FILE = "user.txt";
+    private double totalDistance;
+    private double avgToughness;
+    private double avgPace;
+    private double totalCalories;
+    private int nrOfSteps;
+    private int nrOfTrips;
+
     //permissions til lokasjon
     private static String[] requiredLocationPermissions = {
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -378,6 +385,24 @@ public class MapFragment extends Fragment implements LocationListener {
 
     private void initTripObserver(){
         // Is trip planned, finished?
+        tripViewModel.getTotalLength().observe(getViewLifecycleOwner(), length ->{
+            totalDistance = length.doubleValue();
+        });
+        tripViewModel.getAvgToughness().observe(getViewLifecycleOwner(), toughness ->{
+            avgToughness = toughness.doubleValue();
+        });
+        tripViewModel.getAvgPace().observe(getViewLifecycleOwner(), pace ->{
+            avgPace = pace.doubleValue();
+        });
+        tripViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories ->{
+            totalCalories = calories.doubleValue();
+        });
+        tripViewModel.getNrOfTrips().observe(getViewLifecycleOwner(), trips ->{
+            nrOfTrips = trips.intValue();
+        });
+        tripViewModel.getTotalSteps().observe(getViewLifecycleOwner(), steps ->{
+            nrOfSteps = steps.intValue();
+        });
         if(tripStatusFromNavigation > 0){
             tripViewModel.getTripById(tripIdFromNavigation).observe(getViewLifecycleOwner(), chosenTrip ->{
                 this.trip = chosenTrip;
@@ -805,17 +830,16 @@ public class MapFragment extends Fragment implements LocationListener {
     }
 
     private void updatePersonData(){
-        TripRepository tripRepository = new TripRepository(requireActivity().getApplication());
-        double totalDistance = tripRepository.getTotalLength();
-        double avgToughness = tripRepository.getAvgToughness();
-        double calories = tripRepository.getTotalCalories();
-        double avgPace = tripRepository.getAvgPace();
-        int nrOfTrips = tripRepository.getNrOfTrips();
+        //double totalDistance = tripRepository.getTotalLength();
+        //double avgToughness = tripViewModel.getAvgToughness();
+        //double calories = tripViewModel.getTotalCalories();
+        //double avgPace = tripViewModel.getAvgPace();
+        //int nrOfTrips = tripViewModel.getNrOfTrips();
         user.setDistanceHiked(totalDistance);
         user.setAverageToughness(avgToughness);
-        user.setTotalCalories(calories);
+        user.setTotalCalories(totalCalories);
         user.setAveragePace(avgPace);
-        //user.setTotalSteps(tripViewModel.getTotalSteps());
+        user.setTotalSteps(nrOfSteps);
         user.setNrOfTrips(nrOfTrips);
         savePersonData();
     }

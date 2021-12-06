@@ -21,13 +21,13 @@ public class TripRepository {
     private LiveData<List<Trip>> finishedTrips;
     private LiveData<Trip> onGoingTrip;
     private LiveData<Trip> lastCreatedTrip;
-    private double totalLength;
+    private LiveData<Double> totalLength;
     private double avgLength;
-    private double avgToughness;
-    private double avgPace;
-    private double totalCalories;
-    private int nrOfTrips;
-    private int totalSteps;
+    private LiveData<Double> avgToughness;
+    private LiveData<Double> avgPace;
+    private LiveData<Double> totalCalories;
+    private LiveData<Integer> nrOfTrips;
+    private LiveData<Integer> totalSteps;
 
     public TripRepository(Application application){
         TripLocationRoomDB db = TripLocationRoomDB.getDatabase(application);
@@ -37,6 +37,12 @@ public class TripRepository {
         finishedTrips = tripLocationDAO.getAllFinishedTrips();
         onGoingTrip = tripLocationDAO.getOngoingTrip();
         lastCreatedTrip = tripLocationDAO.getLastCreatedTrip();
+        totalLength = tripLocationDAO.getTotalLength();
+        avgToughness = tripLocationDAO.getAvgToughness();
+        avgPace = tripLocationDAO.getAvgPace();
+        totalCalories = tripLocationDAO.getTotalCalories();
+        nrOfTrips = tripLocationDAO.getNrOfTrips();
+        totalSteps = tripLocationDAO.getTotalSteps();
     }
 
     public long insert(Trip trip){
@@ -159,12 +165,12 @@ public class TripRepository {
         return tripLocationDAO.getActualStartLocation(fk_trip);
     }
 
-    public double getTotalLength (){
-        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+    public LiveData<Double> getTotalLength (){
+        /*TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
 
             totalLength = tripLocationDAO.getTotalLength();
 
-        });
+        });*/
         return totalLength;
     }
 
@@ -176,41 +182,41 @@ public class TripRepository {
         return avgLength;
     }
 
-    public double getAvgToughness (){
-        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+    public LiveData<Double> getAvgToughness (){
+        /*TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
 
             avgToughness = tripLocationDAO.getAvgToughness();
-        });
+        });*/
         return avgToughness;
     }
 
-    public double getAvgPace (){
-        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+    public LiveData<Double> getAvgPace (){
+        /*TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
 
             avgPace = tripLocationDAO.getAvgPace();
-        });
+        });*/
         return avgPace;
     }
 
-    public double getTotalCalories(){
-        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+    public LiveData<Double> getTotalCalories(){
+        /*TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
 
             totalCalories = tripLocationDAO.getTotalCalories();
-        });
+        });*/
         return totalCalories;
     }
 
-    public int getNrOfTrips(){
-        TripLocationRoomDB.databaseWriteExecutor.execute(()->{
+    public LiveData<Integer> getNrOfTrips(){
+        /*TripLocationRoomDB.databaseWriteExecutor.execute(()->{
             nrOfTrips = tripLocationDAO.getNrOfTrips();
-        });
+        });*/
         return nrOfTrips;
     }
 
-    public int getTotalSteps(){
-        TripLocationRoomDB.databaseWriteExecutor.execute(()->{
+    public LiveData<Integer> getTotalSteps(){
+        /*TripLocationRoomDB.databaseWriteExecutor.execute(()->{
             totalSteps = tripLocationDAO.getTotalSteps();
-        });
+        });*/
         return totalSteps;
     }
 }

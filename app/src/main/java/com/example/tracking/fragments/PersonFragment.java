@@ -179,7 +179,7 @@ public class PersonFragment extends Fragment {
         etDistance.setText(String.format("%,.2f", user.getDistanceHiked()/1000));
         etAvgToughness.setText(Trip.getToughnessInText(user.getAverageToughness()));
         etTotalCalories.setText(String.format("%,.2f", user.getTotalCalories()));
-        etAvgPace.setText(user.getAveragePace() + "");
+        etAvgPace.setText(String.format("%,.2f", user.getAveragePace()));
         etTotalSteps.setText(user.getTotalSteps() + "");
         etTotalTrips.setText(user.getNrOfTrips() + "");
     }

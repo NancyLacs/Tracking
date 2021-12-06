@@ -20,12 +20,12 @@ public class TripViewModel extends AndroidViewModel {
     private final LiveData<List<Trip>> finishedTrips;
     private final LiveData<Trip> onGoingTrip;
     private final LiveData<Trip> lastCreatedTrip;
-    private double totalLength;
-    private double avgToughness;
-    private double avgPace;
-    private int nrOfSteps;
-    private int nrOfTrips;
-    private double totalCalories;
+    private final LiveData<Double> totalLength;
+    private final LiveData<Double> avgToughness;
+    private final LiveData<Double> avgPace;
+    private final LiveData<Integer> nrOfSteps;
+    private final LiveData<Integer> nrOfTrips;
+    private final LiveData<Double> totalCalories;
 
     public TripViewModel(@NonNull Application application) {
         super(application);
@@ -35,6 +35,12 @@ public class TripViewModel extends AndroidViewModel {
         finishedTrips = tripRepository.getAllFinishedTrips();
         onGoingTrip = tripRepository.getOnGoingTrip();
         lastCreatedTrip = tripRepository.getLastCreatedTrip();
+        totalLength = tripRepository.getTotalLength();
+        avgToughness = tripRepository.getAvgToughness();
+        avgPace = tripRepository.getAvgPace();
+        nrOfSteps = tripRepository.getTotalSteps();
+        nrOfTrips = tripRepository.getNrOfTrips();
+        totalCalories = tripRepository.getTotalCalories();
     }
 
     public long insert(Trip trip){
@@ -131,29 +137,29 @@ public class TripViewModel extends AndroidViewModel {
         return tripRepository.getActualStartLocation(fk_trip);
     }
 
-    public double getTotalLength(){
-        totalLength = tripRepository.getTotalLength();
+    public LiveData<Double> getTotalLength(){
+        //totalLength = tripRepository.getTotalLength();
 
         return totalLength;
     }
 
-    public double getAvgToughness(){
-        avgToughness = tripRepository.getAvgToughness();
+    public LiveData<Double> getAvgToughness(){
+        //avgToughness = tripRepository.getAvgToughness();
         return avgToughness;
     }
 
-    public double getAvgPace(){
-        avgPace = tripRepository.getAvgPace();
+    public LiveData<Double> getAvgPace(){
+        //avgPace = tripRepository.getAvgPace();
         return avgPace;
     }
 
-    public double getTotalCalories(){
-        totalCalories = tripRepository.getTotalCalories();
+    public LiveData<Double> getTotalCalories(){
+        //totalCalories = tripRepository.getTotalCalories();
         return totalCalories;
     }
 
-    public int getNrOfTrips(){
-        nrOfTrips = tripRepository.getNrOfTrips();
+    public LiveData<Integer> getNrOfTrips(){
+        //nrOfTrips = tripRepository.getNrOfTrips();
         return nrOfTrips;
     }
 
@@ -162,8 +168,8 @@ public class TripViewModel extends AndroidViewModel {
         return tripRepository.getAvgLength();
     }
 
-    public int getTotalSteps(){
-        nrOfSteps = tripRepository.getTotalSteps();
+    public LiveData<Integer> getTotalSteps(){
+        //nrOfSteps = tripRepository.getTotalSteps();
         return nrOfSteps;
     }
 
