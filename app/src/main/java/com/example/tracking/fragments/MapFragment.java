@@ -7,6 +7,10 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -75,11 +79,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class MapFragment extends Fragment implements LocationListener {
+public class MapFragment extends Fragment implements LocationListener, SensorEventListener {
 
     private View view;
 
-    //Person
+    //Person file
     private Person user;
     private File file;
     private final String PERSON_FILE = "user.txt";
@@ -95,6 +99,11 @@ public class MapFragment extends Fragment implements LocationListener {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
+
+    private static String [] activityRecognitionPermission = {
+            Manifest.permission.ACTIVITY_RECOGNITION
+    };
+    private boolean noStepDetection = false;
 
     private TextView tvTripNameMap;
 
@@ -112,12 +121,14 @@ public class MapFragment extends Fragment implements LocationListener {
     boolean chosenStart = false; //for tapsingle....
     boolean chosenEnd = false;
 
+    //For henting av data fra db
     private TripViewModel tripViewModel;
 
     //From navigation fragment
     private long tripIdFromNavigation;
     private int tripStatusFromNavigation;
 
+    //Aktuell tur
     private Trip trip;
     private String tripName;
 
@@ -127,6 +138,7 @@ public class MapFragment extends Fragment implements LocationListener {
     private TextView tvTripDialogName, tvTripDialogStatus, tvTripDialogStart, tvTripDialogFinish, tvTripDialogDistance,
             tvTripDialogDuration, tvTripDialogToughness, tvTripDialogPace, tvTripDialogPlanned,
             tvTripDialogBackpack, tvTripDialogCalories, tvTripDialogElevation;
+
     private boolean requestingLocationUpdates = false;
 
     //Lokalisering
@@ -163,7 +175,40 @@ public class MapFragment extends Fragment implements LocationListener {
     private Calendar date;
 
     //Sensor
+    private SensorManager mSensorManager;
 
+    private ActivityResultLauncher<String[]> locationPermissionRequest =
+            registerForActivityResult(new ActivityResultContracts
+                            .RequestMultiplePermissions(), result -> {
+                        Boolean fineLocationGranted = result.getOrDefault(
+                                Manifest.permission.ACCESS_FINE_LOCATION, false);
+                        Boolean coarseLocationGranted = result.getOrDefault(
+                                Manifest.permission.ACCESS_COARSE_LOCATION,false);
+                        if (fineLocationGranted != null && fineLocationGranted) {
+                            // Precise location access granted.
+                            requestingLocationUpdates = true;
+                            requestLocationUpdates();
+                            initTripObserver();
+                        }  else {
+                            showMapOnly = true;
+                        }
+                    }
+            );
+
+    private ActivityResultLauncher<String[]> activityRecognitionRequest =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                    result -> {
+                        Boolean activityRecognitionGranted = result.getOrDefault(
+                                Manifest.permission.ACTIVITY_RECOGNITION, false);
+                        if(activityRecognitionGranted!=null && activityRecognitionGranted){
+                            Sensor stepDetector= mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+                            if (stepDetector != null) {
+                                mSensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_NORMAL);
+                            }
+                        } else {
+                            noStepDetection = true;
+                        }
+                    });
 
     public MapFragment() {
         // Required empty public constructor
@@ -179,6 +224,18 @@ public class MapFragment extends Fragment implements LocationListener {
     public void onResume() {
         super.onResume();
         verifyPermissions();
+        Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        if (accelerometer != null) {
+            mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        Sensor rotation_vector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        if (rotation_vector != null) {
+            mSensorManager.registerListener(this, rotation_vector, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        /*Sensor stepDetector= mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        if (stepDetector != null) {
+            mSensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_NORMAL);
+        }*/
     }
 
     @Override
@@ -197,6 +254,7 @@ public class MapFragment extends Fragment implements LocationListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         this.view = view;
+        mSensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
         dialogView = getLayoutInflater().inflate(R.layout.new_trip_dialog, null);
         tripDialogView = getLayoutInflater().inflate(R.layout.trip_detail_layout, null);
         tripIdFromNavigation = MapFragmentArgs.fromBundle(getArguments()).getTripId();
@@ -721,7 +779,7 @@ public class MapFragment extends Fragment implements LocationListener {
         }
     }
 
-    ActivityResultLauncher<String[]> locationPermissionRequest =
+    /*ActivityResultLauncher<String[]> locationPermissionRequest =
             registerForActivityResult(new ActivityResultContracts
                             .RequestMultiplePermissions(), result -> {
                         Boolean fineLocationGranted = result.getOrDefault(
@@ -738,6 +796,21 @@ public class MapFragment extends Fragment implements LocationListener {
                         }
                     }
             );
+
+    ActivityResultLauncher<String[]> activityRecognitionRequest =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                    result -> {
+                Boolean activityRecognitionGranted = result.getOrDefault(
+                        Manifest.permission.ACTIVITY_RECOGNITION, false);
+                if(activityRecognitionGranted!=null && activityRecognitionGranted){
+                    Sensor stepDetector= mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+                    if (stepDetector != null) {
+                        mSensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_NORMAL);
+                    }
+                } else {
+                    noStepDetection = true;
+                }
+                    });*/
 
     private boolean hasPermissions(String... permissions) {
         if (permissions != null) {
@@ -767,6 +840,16 @@ public class MapFragment extends Fragment implements LocationListener {
             requestingLocationUpdates = true;
             requestLocationUpdates();
             initTripObserver();
+        }
+        if (!hasPermissions(activityRecognitionPermission)){
+            if(!noStepDetection){
+                activityRecognitionRequest.launch(activityRecognitionPermission);
+            }
+        } else {
+            Sensor stepDetector= mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+            if (stepDetector != null) {
+                mSensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_NORMAL);
+            }
         }
     }
 
@@ -902,4 +985,35 @@ public class MapFragment extends Fragment implements LocationListener {
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        int sensorType = sensorEvent.sensor.getType();
+        switch (sensorType){
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                /*Toast.makeText(requireContext(), "Linear accelerometer: " + sensorEvent.values[0] + ", " +
+                        sensorEvent.values[1] + "," + sensorEvent.values[2], Toast.LENGTH_SHORT).show();*/
+                break;
+            case Sensor.TYPE_ROTATION_VECTOR:
+                /*Toast.makeText(requireContext(), "Rotation vector: " + sensorEvent.values[0] + ", " +
+                        sensorEvent.values[1] + "," + sensorEvent.values[2], Toast.LENGTH_SHORT).show();*/
+                break;
+            case Sensor.TYPE_STEP_DETECTOR:
+                //Toast.makeText(requireContext(), "Step counter: " + sensorEvent.values[0], Toast.LENGTH_SHORT).show();
+                if(trip!=null && trip.status==2 && tracking){
+                    trip.steps +=1;
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mSensorManager.unregisterListener(this);
+    }
 }
