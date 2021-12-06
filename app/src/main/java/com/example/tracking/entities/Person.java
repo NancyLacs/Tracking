@@ -1,6 +1,7 @@
 package com.example.tracking.entities;
 
 
+import java.io.File;
 import java.io.Serializable;
 
 public class Person implements Serializable {
@@ -9,10 +10,18 @@ public class Person implements Serializable {
     private double weight;
     private double distanceHiked = 0.0;
     private double averageToughness = 0.0;
-    private double totalToughness = 0.0;
     private double averagePace = 0.0;
-    private double totalPace = 0.0;
+    private double totalCalories = 0.0;
+    private int totalSteps = 0;
+    private int nrOfTrips = 0;
 
+    public int getNrOfTrips() {
+        return nrOfTrips;
+    }
+
+    public void setNrOfTrips(int nrOfTrips) {
+        this.nrOfTrips = nrOfTrips;
+    }
 
     public Person(String name, int age, double weight) {
         this.name = name;
@@ -60,14 +69,6 @@ public class Person implements Serializable {
         this.averageToughness = averageToughness;
     }
 
-    public double getTotalToughness() {
-        return totalToughness;
-    }
-
-    public void setTotalToughness(double totalToughness) {
-        this.totalToughness = totalToughness;
-    }
-
     public double getAveragePace() {
         return averagePace;
     }
@@ -76,11 +77,19 @@ public class Person implements Serializable {
         this.averagePace = averagePace;
     }
 
-    public double getTotalPace() {
-        return totalPace;
+    public double getTotalCalories() {
+        return totalCalories;
     }
 
-    public void setTotalPace(double totalPace) {
-        this.totalPace = totalPace;
+    public void setTotalCalories(double totalCalories) {
+        this.totalCalories = totalCalories;
+    }
+
+    public int getTotalSteps() {
+        return totalSteps;
+    }
+
+    public void setTotalSteps(int totalSteps) {
+        this.totalSteps = totalSteps;
     }
 }

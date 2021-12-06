@@ -161,7 +161,7 @@ public class PlannedTripsFragment extends Fragment {
         tvTripDialogDistance.setText(String.format("%,.2f km", trip.length/100));
         tvTripDialogDuration.setText(trip.duration/3600 + ":" + ((trip.duration/60)-((trip.duration/3600)*60)) +
                 ":" + trip.duration%60);
-        tvTripDialogToughness.setText(trip.getToughnessInText());
+        tvTripDialogToughness.setText(Trip.getToughnessInText(trip.toughness));
         tvTripDialogPace.setText(String.format("%,.2f m/s", trip.pace));
         tvTripDialogBackpack.setText(String.format("%,.1f kg", trip.extraLoad));
         tvTripDialogCalories.setText(String.format("%,.2f kcal", trip.calories));

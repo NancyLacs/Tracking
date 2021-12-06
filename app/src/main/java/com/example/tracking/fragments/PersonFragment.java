@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.tracking.R;
 import com.example.tracking.entities.Person;
+import com.example.tracking.entities.Trip;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +44,7 @@ public class PersonFragment extends Fragment {
     private Button btnSave, btnContinue;
     private View btnSaveView;
     private MenuItem home;
-    private EditText etName, etAge, etWeight, etDistance, etAvgToughness, etTotalToughness, etAvgPace, etTotalPace;
+    private EditText etName, etAge, etWeight, etDistance, etAvgToughness, etTotalCalories, etAvgPace, etTotalTrips, etTotalSteps;
 
 
     public PersonFragment() {
@@ -78,9 +79,10 @@ public class PersonFragment extends Fragment {
         etWeight = view.findViewById(R.id.etProfileWeight);
         etDistance = view.findViewById(R.id.etProfileDistanceHiked);
         etAvgToughness = view.findViewById(R.id.etProfileAverageToughness);
-        etTotalToughness = view.findViewById(R.id.etProfileTotalToughness);
+        etTotalCalories = view.findViewById(R.id.etProfileCalories);
         etAvgPace = view.findViewById(R.id.etProfileAveragePace);
-        etTotalPace = view.findViewById(R.id.etProfileTotalPace);
+        etTotalSteps = view.findViewById(R.id.etProfileTotalSteps);
+        etTotalTrips = view.findViewById(R.id.etProfileNrOfTrips);
         String path = requireContext().getFilesDir().getAbsolutePath();
         file = new File(path, PERSONFILE);
         if(file.exists()){
@@ -174,22 +176,23 @@ public class PersonFragment extends Fragment {
         etName.setText(user.getName());
         etAge.setText(user.getAge() + "");
         etWeight.setText(user.getWeight() +"");
-        etDistance.setText(user.getDistanceHiked() + "");
-        etAvgToughness.setText(user.getAverageToughness() + "");
-        etTotalToughness.setText(user.getTotalToughness() + "");
+        etDistance.setText(String.format("%,.2f", user.getDistanceHiked()/1000));
+        etAvgToughness.setText(Trip.getToughnessInText(user.getAverageToughness()));
+        etTotalCalories.setText(String.format("%,.2f", user.getTotalCalories()));
         etAvgPace.setText(user.getAveragePace() + "");
-        etTotalPace.setText(user.getTotalPace() + "");
+        etTotalSteps.setText(user.getTotalSteps() + "");
+        etTotalTrips.setText(user.getNrOfTrips() + "");
     }
 
     private void updatePersonData(){
         user.setName(etName.getText().toString());
         user.setAge(Integer.parseInt(etAge.getText().toString()));
         user.setWeight(Double.parseDouble(etWeight.getText().toString()));
-        user.setDistanceHiked(Double.parseDouble(etDistance.getText().toString()));
+        /*user.setDistanceHiked(Double.parseDouble(etDistance.getText().toString()));
         user.setAverageToughness(Double.parseDouble(etAvgToughness.getText().toString()));
-        user.setTotalToughness(Double.parseDouble(etTotalToughness.getText().toString()));
+        user.setTotalCalories(Double.parseDouble(etTotalCalories.getText().toString()));
         user.setAveragePace(Double.parseDouble(etAvgPace.getText().toString()));
-        user.setTotalPace(Double.parseDouble(etTotalPace.getText().toString()));
+        user.setTotalSteps(Integer.parseInt(etTotalSteps.getText().toString()));*/
         savePersonData();
     }
 

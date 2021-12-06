@@ -78,15 +78,24 @@ public interface TripLocationDAO {
     @Query("SELECT SUM(length) FROM Trip")
     double getTotalLength();
 
-    @Query("SELECT AVG(length) FROM Trip")
+    @Query("SELECT AVG(length) FROM Trip WHERE status=3")
     double getAvgLength();
 
     //Avg toughness
-    @Query("SELECT AVG(toughness) FROM Trip")
+    @Query("SELECT AVG(toughness) FROM Trip WHERE status = 3")
     double getAvgToughness();
 
-    @Query("SELECT AVG(pace) FROM Trip")
+    @Query("SELECT AVG(pace) FROM Trip WHERE status = 3")
     double getAvgPace();
+
+    @Query("SELECT SUM(calories) FROM Trip WHERE status = 3")
+    double getTotalCalories();
+
+    @Query("SELECT COUNT(*) FROM Trip WHERE status = 3")
+    int getNrOfTrips();
+
+    @Query("SELECT COUNT(steps) FROM Trip WHERE status = 3")
+    int getTotalSteps();
 
     //oppdaterer startDato
     @Query("UPDATE Trip SET startTime = :start WHERE tripId = :tripId")

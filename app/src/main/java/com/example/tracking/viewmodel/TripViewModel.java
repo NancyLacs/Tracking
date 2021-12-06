@@ -20,6 +20,12 @@ public class TripViewModel extends AndroidViewModel {
     private final LiveData<List<Trip>> finishedTrips;
     private final LiveData<Trip> onGoingTrip;
     private final LiveData<Trip> lastCreatedTrip;
+    private double totalLength;
+    private double avgToughness;
+    private double avgPace;
+    private int nrOfSteps;
+    private int nrOfTrips;
+    private double totalCalories;
 
     public TripViewModel(@NonNull Application application) {
         super(application);
@@ -124,4 +130,41 @@ public class TripViewModel extends AndroidViewModel {
     public LiveData<Location> getActualStartLocation(long fk_trip){
         return tripRepository.getActualStartLocation(fk_trip);
     }
+
+    public double getTotalLength(){
+        totalLength = tripRepository.getTotalLength();
+
+        return totalLength;
+    }
+
+    public double getAvgToughness(){
+        avgToughness = tripRepository.getAvgToughness();
+        return avgToughness;
+    }
+
+    public double getAvgPace(){
+        avgPace = tripRepository.getAvgPace();
+        return avgPace;
+    }
+
+    public double getTotalCalories(){
+        totalCalories = tripRepository.getTotalCalories();
+        return totalCalories;
+    }
+
+    public int getNrOfTrips(){
+        nrOfTrips = tripRepository.getNrOfTrips();
+        return nrOfTrips;
+    }
+
+    public double getAvgHikeDistance(){
+
+        return tripRepository.getAvgLength();
+    }
+
+    public int getTotalSteps(){
+        nrOfSteps = tripRepository.getTotalSteps();
+        return nrOfSteps;
+    }
+
 }

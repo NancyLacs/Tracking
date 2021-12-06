@@ -21,6 +21,13 @@ public class TripRepository {
     private LiveData<List<Trip>> finishedTrips;
     private LiveData<Trip> onGoingTrip;
     private LiveData<Trip> lastCreatedTrip;
+    private double totalLength;
+    private double avgLength;
+    private double avgToughness;
+    private double avgPace;
+    private double totalCalories;
+    private int nrOfTrips;
+    private int totalSteps;
 
     public TripRepository(Application application){
         TripLocationRoomDB db = TripLocationRoomDB.getDatabase(application);
@@ -152,4 +159,58 @@ public class TripRepository {
         return tripLocationDAO.getActualStartLocation(fk_trip);
     }
 
+    public double getTotalLength (){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+
+            totalLength = tripLocationDAO.getTotalLength();
+
+        });
+        return totalLength;
+    }
+
+    public double getAvgLength (){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+
+            avgLength = tripLocationDAO.getAvgLength();
+        });
+        return avgLength;
+    }
+
+    public double getAvgToughness (){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+
+            avgToughness = tripLocationDAO.getAvgToughness();
+        });
+        return avgToughness;
+    }
+
+    public double getAvgPace (){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+
+            avgPace = tripLocationDAO.getAvgPace();
+        });
+        return avgPace;
+    }
+
+    public double getTotalCalories(){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()-> {
+
+            totalCalories = tripLocationDAO.getTotalCalories();
+        });
+        return totalCalories;
+    }
+
+    public int getNrOfTrips(){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()->{
+            nrOfTrips = tripLocationDAO.getNrOfTrips();
+        });
+        return nrOfTrips;
+    }
+
+    public int getTotalSteps(){
+        TripLocationRoomDB.databaseWriteExecutor.execute(()->{
+            totalSteps = tripLocationDAO.getTotalSteps();
+        });
+        return totalSteps;
+    }
 }

@@ -21,6 +21,7 @@ public class Trip {
     public double met;// metabolic equivalent task (MET) for å regne ut kalorie
     public double extraLoad;
     public double calories;
+    public int steps;
 
 
     public Trip(@NonNull String tripName, @NonNull String date, double extraLoad) {
@@ -37,6 +38,7 @@ public class Trip {
         this.met = 2.0; //vanlig gåing, endres etter pace
         this.extraLoad = extraLoad; // ekstra vekt på tur
         this.calories = 0.0;
+        this.steps = 0;
     }
 
     public long getTripId() {
@@ -71,15 +73,15 @@ public class Trip {
         this.status = status;
     }
 
-    public String getToughnessInText(){
+    public static String getToughnessInText(double toughnessValue){
         String toughnessText = "";
-        if(toughness == 0){
+        if(toughnessValue == 0){
             toughnessText = "";
-        } else if (toughness < 50){
+        } else if (toughnessValue < 50){
             toughnessText = "Easiest";
-        } else if (toughness < 100){
+        } else if (toughnessValue < 100){
             toughnessText = "Moderate";
-        } else if (toughness < 150){
+        } else if (toughnessValue < 150){
             toughnessText = "Moderately Strenuous";
         } else{
             toughnessText = "Strenuous";
@@ -111,6 +113,10 @@ public class Trip {
 
     public void setCaloriesBasedOnTrip(double weight){ //Kalorier brent på tur https://hikingandfishing.com/hiking-calories-burned-calculator/, https://greatist.com/fitness/hiking-calories-burned
         calories = met * (weight + extraLoad) * (duration/3600.00);
+    }
+
+    public void calculateToughness (){ //Terrain type not taken into consideration & negative elevation is counted as positive
+        Math.sqrt(Math.abs(elevation/3.281) * 2 * ((length/1000)/1.609)); //https://mountainsmagleb.com/2020/04/16/how-to-calculate-hiking-difficulty-and-duration/
     }
 
 
