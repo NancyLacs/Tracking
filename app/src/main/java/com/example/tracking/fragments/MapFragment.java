@@ -118,7 +118,8 @@ public class MapFragment extends Fragment implements LocationListener {
     private AlertDialog tripDialog;
     private View tripDialogView;
     private TextView tvTripDialogName, tvTripDialogStatus, tvTripDialogStart, tvTripDialogFinish, tvTripDialogDistance,
-            tvTripDialogDuration, tvTripDialogToughness, tvTripDialogPace, tvTripDialogPlanned;
+            tvTripDialogDuration, tvTripDialogToughness, tvTripDialogPace, tvTripDialogPlanned,
+            tvTripDialogBackpack, tvTripDialogCalories, tvTripDialogElevation;
     private boolean requestingLocationUpdates = false;
 
     //Lokalisering
@@ -136,12 +137,16 @@ public class MapFragment extends Fragment implements LocationListener {
     private Location startLocation;
     private float distanceToStartLoc;
 
+    //Aktuell tur
+    private Location actualStartLocation;
+
     //Kontroller
     private ImageView btAutoCenter, btAdd, btPlay, btStop, btPlanRoute, btSave, btInfo;
 
     //Dialog for ny tur
     private AlertDialog alertDialog;
     private EditText etTripNameDialog;
+    private EditText etTripBackPack;
     private CalendarView cvTripDate;
     private View dialogView;
     private static final String MY_DATE_FORMAT = "dd.MM.yyyy";
@@ -260,6 +265,7 @@ public class MapFragment extends Fragment implements LocationListener {
             @Override
             public void onClick(View view) {
                 btPlanRoute.setVisibility(View.GONE);
+                getActualStartLocation();
                 if(tripStatusFromNavigation == 0 && !registerMode){
                     tracking = true;
                     Toast.makeText(requireContext(), "Your tracks are drawn but are not saved.", Toast.LENGTH_SHORT).show();
@@ -319,7 +325,7 @@ public class MapFragment extends Fragment implements LocationListener {
                         long msDifference = end.getTime()-start.getTime();
                         long secDiff = (msDifference/1000)%60;
                         String dateString = new SimpleDateFormat(START_END_DATE_FORMAT).format(end);
-                        double startAltitude = startLocation.altitude;
+                        double startAltitude = actualStartLocation.altitude;
                         double currentAltitude = currentLocation.getAltitude();
                         double altitudeDiff = currentAltitude - startAltitude;
                         double distance = mPolyline.getDistance();
@@ -331,6 +337,8 @@ public class MapFragment extends Fragment implements LocationListener {
                         trip.pace = trip.length/(double)secDiff; //m/s
                         trip.elevation = altitudeDiff;
                         trip.toughness = toughness;
+                        trip.setMETBasedOnPace();
+                        trip.setCaloriesBasedOnTrip(user.getWeight());
                         tripViewModel.updateTrip(trip);
                         NavController navController = Navigation.findNavController(view);
                         MapFragmentDirections.ActionMapFragmentToPlannedTripsFragment action = MapFragmentDirections.actionMapFragmentToPlannedTripsFragment();
@@ -360,6 +368,14 @@ public class MapFragment extends Fragment implements LocationListener {
         return date;
     }
 
+    private void getActualStartLocation(){
+        if(trip!=null){
+            tripViewModel.getActualStartLocation(trip.tripId).observe(getViewLifecycleOwner(), actualStartLocation ->{
+                this.actualStartLocation = actualStartLocation;
+            });
+        }
+    }
+
     private void initTripObserver(){
         // Is trip planned, finished?
         if(tripStatusFromNavigation > 0){
@@ -379,6 +395,9 @@ public class MapFragment extends Fragment implements LocationListener {
             tripViewModel.getStartLocation(tripIdFromNavigation).observe(getViewLifecycleOwner(), startLocation ->{
                 this.startLocation = startLocation;
             });
+            /*tripViewModel.getActualStartLocation(tripIdFromNavigation).observe(getViewLifecycleOwner(), actualStartLocation ->{
+                this.actualStartLocation = actualStartLocation;
+            });*/
             tripViewModel.getLocationsForTrip(tripIdFromNavigation).observe(getViewLifecycleOwner(), locations -> {
                 drawTracks(locations);
             });
@@ -392,9 +411,13 @@ public class MapFragment extends Fragment implements LocationListener {
         tvTripDialogStart.setText(trip.startTime);
         tvTripDialogFinish.setText(trip.endTime);
         tvTripDialogDistance.setText(String.format("%,.2f km", trip.length/100));
-        tvTripDialogDuration.setText(trip.duration + "");
+        tvTripDialogDuration.setText(trip.duration/3600 + ":" + ((trip.duration/60)-((trip.duration/3600)*60)) +
+                ":" + trip.duration%60);
         tvTripDialogToughness.setText(trip.getToughnessInText());
         tvTripDialogPace.setText(String.format("%,.2f m/s", trip.pace));
+        tvTripDialogBackpack.setText(String.format("%,.1f kg", trip.extraLoad));
+        tvTripDialogCalories.setText(String.format("%,.2f kcal", trip.calories));
+        tvTripDialogElevation.setText(String.format("%,.2f m", trip.elevation));
         btInfo.setVisibility(View.VISIBLE);
     }
 
@@ -450,7 +473,9 @@ public class MapFragment extends Fragment implements LocationListener {
         tvTripDialogToughness = tripDialogView.findViewById(R.id.tvTripDetailToughnessValue);
         tvTripDialogPace = tripDialogView.findViewById(R.id.tvTripDetailPaceValue);
         tvTripDialogPlanned = tripDialogView.findViewById(R.id.tvTripDetailPlannedValue);
-
+        tvTripDialogBackpack = tripDialogView.findViewById(R.id.tvTripDetailBackpackValue);
+        tvTripDialogCalories = tripDialogView.findViewById(R.id.tvTripDetailCaloriesValue);
+        tvTripDialogElevation = tripDialogView.findViewById(R.id.tvTripDetailElevationValue);
         tripDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Exit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -464,9 +489,10 @@ public class MapFragment extends Fragment implements LocationListener {
         alertDialog = new AlertDialog.Builder(requireContext()).create();
         alertDialog.setTitle("New Trip");
         alertDialog.setCancelable(false);
-        alertDialog.setMessage("Fill in the name and date of trip");
+        alertDialog.setMessage("Fill in the name, optional backpack weight and date of trip ");
 
         etTripNameDialog = dialogView.findViewById(R.id.etTripNameDialog);
+        etTripBackPack = dialogView.findViewById(R.id.etTripBackPackDialog);
         cvTripDate = dialogView.findViewById(R.id.cvTripDateDialog);
         cvTripDate.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -492,6 +518,7 @@ public class MapFragment extends Fragment implements LocationListener {
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SAVE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                double backPackWeight = Double.parseDouble(etTripBackPack.getText().toString());
                 tripName = etTripNameDialog.getText().toString();
                 tripViewModel.getNewTrip().observe(getViewLifecycleOwner(), newTrip ->{
                     trip = newTrip;
@@ -500,7 +527,7 @@ public class MapFragment extends Fragment implements LocationListener {
                 });
                 if(!tripName.equals("") && date != null){
                     String dateString = new SimpleDateFormat(MY_DATE_FORMAT).format(date.getTime());
-                    Trip inputTrip = new Trip(tripName, dateString);
+                    Trip inputTrip = new Trip(tripName, dateString, backPackWeight);
                     tripViewModel.insert(inputTrip);
                     tvTripNameMap.setText(inputTrip.tripName);
                     btAdd.setVisibility(View.GONE);

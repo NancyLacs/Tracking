@@ -16,7 +16,7 @@ public class Location {
     @PrimaryKey(autoGenerate = true)
     public long locationId;
     public long fk_trip;
-    public int partOfTrip; //0=start, 1=mellom, 2=slutt, 3=nåværende/sporing
+    public int partOfTrip; //0=startplanlagt, 1=mellomplanlagt, 2=sluttplanlagt, 3=nåværende/sporing
     public double latitude;
     public double longitude;
     public double altitude;

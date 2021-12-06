@@ -148,4 +148,8 @@ public class TripRepository {
         return tripLocationDAO.getStartLocation(fk_trip);
     }
 
+    public LiveData<Location> getActualStartLocation(long fk_trip){
+        return tripLocationDAO.getActualStartLocation(fk_trip);
+    }
+
 }

@@ -132,5 +132,8 @@ public interface TripLocationDAO {
     @Query("SELECT * FROM Location WHERE partOfTrip = 0 AND fk_trip = :fk_trip")
     LiveData<Location> getStartLocation(long fk_trip);
 
+    @Query("SELECT * FROM Location WHERE partOfTrip = 3 AND fk_trip = :fk_trip ORDER BY locationId ASC LIMIT 1")
+    LiveData<Location> getActualStartLocation(long fk_trip);
+
 
 }

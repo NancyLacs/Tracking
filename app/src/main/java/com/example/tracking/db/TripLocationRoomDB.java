@@ -50,7 +50,7 @@ public abstract class TripLocationRoomDB extends RoomDatabase {
 
                 //Legg til en trip som kan brukes som test (eller lignende) senere
                 Date now = new Date();
-                Trip trip1 = new Trip("Testing", simpleDateFormat.format(now));
+                Trip trip1 = new Trip("Testing", simpleDateFormat.format(now), 0.0);
                 long tripId1 = dao.insertTrip(trip1);
 
             });

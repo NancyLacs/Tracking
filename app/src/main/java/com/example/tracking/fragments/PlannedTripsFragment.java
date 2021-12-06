@@ -33,7 +33,8 @@ public class PlannedTripsFragment extends Fragment {
     private AlertDialog tripDialog;
     private View tripDialogView;
     private TextView tvTripDialogName, tvTripDialogStatus, tvTripDialogStart, tvTripDialogFinish, tvTripDialogDistance,
-            tvTripDialogDuration, tvTripDialogToughness, tvTripDialogPace, tvTripDialogPlanned;
+            tvTripDialogDuration, tvTripDialogToughness, tvTripDialogPace, tvTripDialogPlanned, tvTripDialogBackpack,
+            tvTripDialogCalories, tvTripDialogElevation;
 
 
 
@@ -140,7 +141,9 @@ public class PlannedTripsFragment extends Fragment {
         tvTripDialogToughness = tripDialogView.findViewById(R.id.tvTripDetailToughnessValue);
         tvTripDialogPace = tripDialogView.findViewById(R.id.tvTripDetailPaceValue);
         tvTripDialogPlanned = tripDialogView.findViewById(R.id.tvTripDetailPlannedValue);
-
+        tvTripDialogBackpack = tripDialogView.findViewById(R.id.tvTripDetailBackpackValue);
+        tvTripDialogCalories = tripDialogView.findViewById(R.id.tvTripDetailCaloriesValue);
+        tvTripDialogElevation = tripDialogView.findViewById(R.id.tvTripDetailElevationValue);
         tripDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Exit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -156,9 +159,13 @@ public class PlannedTripsFragment extends Fragment {
         tvTripDialogStart.setText(trip.startTime);
         tvTripDialogFinish.setText(trip.endTime);
         tvTripDialogDistance.setText(String.format("%,.2f km", trip.length/100));
-        tvTripDialogDuration.setText(trip.duration + "");
+        tvTripDialogDuration.setText(trip.duration/3600 + ":" + ((trip.duration/60)-((trip.duration/3600)*60)) +
+                ":" + trip.duration%60);
         tvTripDialogToughness.setText(trip.getToughnessInText());
         tvTripDialogPace.setText(String.format("%,.2f m/s", trip.pace));
+        tvTripDialogBackpack.setText(String.format("%,.1f kg", trip.extraLoad));
+        tvTripDialogCalories.setText(String.format("%,.2f kcal", trip.calories));
+        tvTripDialogElevation.setText(String.format("%,.2f m", trip.elevation));
         tripDialog.show();
     }
 }

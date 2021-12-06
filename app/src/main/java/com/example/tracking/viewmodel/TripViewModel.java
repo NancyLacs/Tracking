@@ -120,4 +120,8 @@ public class TripViewModel extends AndroidViewModel {
     public LiveData<Location> getStartLocation(long fk_trip){
         return tripRepository.getStartLocation(fk_trip);
     }
+
+    public LiveData<Location> getActualStartLocation(long fk_trip){
+        return tripRepository.getActualStartLocation(fk_trip);
+    }
 }
