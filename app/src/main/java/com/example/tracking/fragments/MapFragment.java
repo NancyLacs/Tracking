@@ -45,6 +45,7 @@ import com.example.tracking.entities.Location;
 import com.example.tracking.entities.Person;
 import com.example.tracking.entities.Trip;
 
+import com.example.tracking.filter.KalmanFilter;
 import com.example.tracking.repositories.TripRepository;
 import com.example.tracking.viewmodel.TripViewModel;
 
@@ -176,6 +177,9 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
 
     //Sensor
     private SensorManager mSensorManager;
+
+    //Kalman
+    private KalmanFilter kalmanFilter;
 
     private ActivityResultLauncher<String[]> locationPermissionRequest =
             registerForActivityResult(new ActivityResultContracts

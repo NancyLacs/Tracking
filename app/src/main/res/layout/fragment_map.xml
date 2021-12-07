@@ -105,6 +105,25 @@
                 android:src="@drawable/route"
                 android:visibility="gone"
                 />
+
+            <ImageView
+                android:id="@+id/btFilterOn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/filter_on"
+
+                />
+
+            <ImageView
+                android:id="@+id/btFilterOff"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/filter_off"
+                android:visibility="gone"
+                />
+
         </LinearLayout>
 
         <ImageView
