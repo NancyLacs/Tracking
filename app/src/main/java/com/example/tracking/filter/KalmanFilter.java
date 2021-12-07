@@ -46,9 +46,17 @@ public class KalmanFilter {
 
 
 
-    public KalmanFilter (double errorOfEstimate, double errorOfMeasurement, Location initialPosition){
-        this.errorOfEstimatePosition = errorOfEstimate;
-        this.errorOfMeasurementPosition = errorOfMeasurement;
+    public KalmanFilter (double errorOfEstimatePos, double errorOfMeasurementPos,
+                         double errorOfEstimateAcceleration, double errorOfMeasurementAcceleration,
+                         double errorOfEstimateSpeed, double errorOfMeasurementSpeed,
+                         Location initialPosition){
+        this.errorOfEstimatePosition = errorOfEstimatePos;
+        this.errorOfMeasurementPosition = errorOfMeasurementPos;
+        this.errorOfEstimateAcceleration = errorOfEstimateAcceleration;
+        this.errorOfMeasurementAcceleration = errorOfMeasurementAcceleration;
+        this.errorOfEstimateSpeed = errorOfEstimateSpeed;
+        this.errorOfMeasurementSpeed = errorOfMeasurementSpeed;
+
         //this.kalmanGainPosition = errorOfEstimate/(errorOfEstimate+errorOfMeasurement);
         this.previousEstimatedLocation = initialPosition;
         this.currentEstimatedLocation = initialPosition;

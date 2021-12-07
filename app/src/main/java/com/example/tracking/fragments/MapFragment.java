@@ -45,6 +45,7 @@ import com.example.tracking.entities.Location;
 import com.example.tracking.entities.Person;
 import com.example.tracking.entities.Trip;
 
+import com.example.tracking.filter.AccelerationSensor;
 import com.example.tracking.filter.KalmanFilter;
 import com.example.tracking.repositories.TripRepository;
 import com.example.tracking.viewmodel.TripViewModel;
@@ -161,7 +162,7 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
     private Location actualStartLocation;
 
     //Kontroller
-    private ImageView btAutoCenter, btAdd, btPlay, btStop, btPlanRoute, btSave, btInfo;
+    private ImageView btAutoCenter, btAdd, btPlay, btStop, btPlanRoute, btSave, btInfo, btTurnFilterOff, btTurnFilterOn;
 
     //Dialog for ny tur
     private AlertDialog alertDialog;
@@ -177,28 +178,15 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
 
     //Sensor
     private SensorManager mSensorManager;
+    private AccelerationSensor currentAccelerationFromSensor;
 
     //Kalman
     private KalmanFilter kalmanFilter;
+    private boolean kalmanOn = false;
+    private Polyline kalmanPolyline;
+    private android.location.Location currentKalmanLocation;
 
-    private ActivityResultLauncher<String[]> locationPermissionRequest =
-            registerForActivityResult(new ActivityResultContracts
-                            .RequestMultiplePermissions(), result -> {
-                        Boolean fineLocationGranted = result.getOrDefault(
-                                Manifest.permission.ACCESS_FINE_LOCATION, false);
-                        Boolean coarseLocationGranted = result.getOrDefault(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,false);
-                        if (fineLocationGranted != null && fineLocationGranted) {
-                            // Precise location access granted.
-                            requestingLocationUpdates = true;
-                            requestLocationUpdates();
-                            initTripObserver();
-                        }  else {
-                            showMapOnly = true;
-                        }
-                    }
-            );
-
+    //permissions
     private ActivityResultLauncher<String[]> activityRecognitionRequest =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
                     result -> {
@@ -213,6 +201,33 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
                             noStepDetection = true;
                         }
                     });
+    private ActivityResultLauncher<String[]> locationPermissionRequest =
+            registerForActivityResult(new ActivityResultContracts
+                            .RequestMultiplePermissions(), result -> {
+                        Boolean fineLocationGranted = result.getOrDefault(
+                                Manifest.permission.ACCESS_FINE_LOCATION, false);
+                        Boolean coarseLocationGranted = result.getOrDefault(
+                                Manifest.permission.ACCESS_COARSE_LOCATION,false);
+                        if (fineLocationGranted != null && fineLocationGranted) {
+                            // Precise location access granted.
+                            requestingLocationUpdates = true;
+                            requestLocationUpdates();
+                            initTripObserver();
+                            if (!hasPermissions(activityRecognitionPermission)){
+                                if(!noStepDetection){
+                                    activityRecognitionRequest.launch(activityRecognitionPermission);
+                                }
+                            } else {
+                                Sensor stepDetector= mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+                                if (stepDetector != null) {
+                                    mSensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_NORMAL);
+                                }
+                            }
+                        }  else {
+                            showMapOnly = true;
+                        }
+                    }
+            );
 
     public MapFragment() {
         // Required empty public constructor
@@ -272,6 +287,8 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
         btPlanRoute = view.findViewById(R.id.btPlanRoute);
         btSave = view.findViewById(R.id.btSaveToPlanned);
         btInfo = view.findViewById(R.id.infoButton);
+        btTurnFilterOn = view.findViewById(R.id.btFilterOn);
+        btTurnFilterOff = view.findViewById(R.id.btFilterOff);
         createDialogForLocationRequirement();
         createDialogForTripDetails();
         initMap(view);
@@ -430,6 +447,27 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
                 }
             }
         });
+
+        btTurnFilterOn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(requireContext(),"Kalman filter is turned on.", Toast.LENGTH_SHORT).show();
+                btTurnFilterOn.setVisibility(View.GONE);
+                btTurnFilterOff.setVisibility(View.VISIBLE);
+                kalmanOn = true;
+            }
+        });
+
+
+        btTurnFilterOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(requireContext(),"Kalman filter is turned off.", Toast.LENGTH_SHORT).show();
+                btTurnFilterOn.setVisibility(View.VISIBLE);
+                btTurnFilterOff.setVisibility(View.GONE);
+                kalmanOn = false;
+            }
+        });
     }
 
     private Date convertStringToDate(String dateString) throws ParseException {
@@ -448,22 +486,39 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
     private void initTripObserver(){
         // Is trip planned, finished?
         tripViewModel.getTotalLength().observe(getViewLifecycleOwner(), length ->{
-            totalDistance = length.doubleValue();
+            if(length!=null){
+                totalDistance = length.doubleValue();
+            }
+
         });
         tripViewModel.getAvgToughness().observe(getViewLifecycleOwner(), toughness ->{
-            avgToughness = toughness.doubleValue();
+            if(toughness!=null){
+                avgToughness = toughness.doubleValue();
+            }
+
         });
         tripViewModel.getAvgPace().observe(getViewLifecycleOwner(), pace ->{
-            avgPace = pace.doubleValue();
+            if(pace!=null){
+                avgPace = pace.doubleValue();
+            }
+
         });
         tripViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories ->{
-            totalCalories = calories.doubleValue();
+            if(calories!=null){
+                totalCalories = calories.doubleValue();
+            }
+
         });
         tripViewModel.getNrOfTrips().observe(getViewLifecycleOwner(), trips ->{
-            nrOfTrips = trips.intValue();
+            if(trips!=null){
+                nrOfTrips = trips.intValue();
+            }
+
         });
         tripViewModel.getTotalSteps().observe(getViewLifecycleOwner(), steps ->{
-            nrOfSteps = steps.intValue();
+            if(steps!=null){
+                nrOfSteps = steps.intValue();
+            }
         });
         if(tripStatusFromNavigation > 0){
             tripViewModel.getTripById(tripIdFromNavigation).observe(getViewLifecycleOwner(), chosenTrip ->{
@@ -642,6 +697,11 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
         map_view.invalidate();
     }
 
+    private void runKalmanTracking(GeoPoint gp){
+        kalmanPolyline.addPoint(gp);
+        map_view.invalidate();
+    }
+
     private void initMap(View view) {
         Log.d("INITMAP", "initmap");
         //final Context ctx = requireActivity().getApplicationContext();
@@ -707,6 +767,7 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
         map_view.getOverlays().add(this.mScaleBarOverlay);
         //map_view.setVerticalMapRepetitionEnabled(false);
 
+        //Rute vha gps
         plannedRoute = new Polyline(map_view);
         final Paint paint = new Paint();
         paint.setStrokeWidth(5);
@@ -717,6 +778,15 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
         plannedRoute.getOutlinePaintLists().add(new MonochromaticPaintList(paint));
         map_view.getOverlays().add(plannedRoute);
 
+        kalmanPolyline = new Polyline(map_view);
+        final Paint paintKalman = new Paint();
+        paintKalman.setStrokeWidth(5);
+        paintKalman.setStyle(Paint.Style.FILL);
+        paintKalman.setColor(Color.GREEN);
+        paintKalman.setStrokeCap(Paint.Cap.ROUND);
+        paintKalman.setAntiAlias(true);
+        kalmanPolyline.getOutlinePaintLists().add(new MonochromaticPaintList(paint));
+        map_view.getOverlays().add(kalmanPolyline);
         addSingleTapOnPlanning();
     }
 
@@ -844,15 +914,15 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
             requestingLocationUpdates = true;
             requestLocationUpdates();
             initTripObserver();
-        }
-        if (!hasPermissions(activityRecognitionPermission)){
-            if(!noStepDetection){
-                activityRecognitionRequest.launch(activityRecognitionPermission);
-            }
-        } else {
-            Sensor stepDetector= mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-            if (stepDetector != null) {
-                mSensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_NORMAL);
+            if (!hasPermissions(activityRecognitionPermission)){
+                if(!noStepDetection){
+                    activityRecognitionRequest.launch(activityRecognitionPermission);
+                }
+            } else {
+                Sensor stepDetector= mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+                if (stepDetector != null) {
+                    mSensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_NORMAL);
+                }
             }
         }
     }
@@ -876,6 +946,10 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
     public void onLocationChanged(@NonNull android.location.Location location) {
         if(requestingLocationUpdates){
             GeoPoint gp = new GeoPoint(location.getLatitude(), location.getLongitude(), location.getAltitude());
+            if(kalmanFilter == null){
+                kalmanFilter = new KalmanFilter(0.4, 0.6, 0.4, 0.6,
+                        0.4, 0.6, location);  //Assumes that we trust estimates more than measurement..
+            }
             if(currentLocation== null){
                 previousLocation = location;
             } else {
@@ -889,6 +963,11 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
             }
             if (tracking){
                 runTracking(gp);
+                if(kalmanOn){
+                    currentKalmanLocation = kalmanFilter.updatePrediction(location, currentAccelerationFromSensor);
+                    GeoPoint gpK = new GeoPoint(currentKalmanLocation.getLatitude(), currentKalmanLocation.getLongitude(), currentKalmanLocation.getAltitude());
+                    runKalmanTracking(gpK);
+                }
                 if(trip!=null && trip.status == 2){
                     tripViewModel.insert(new Location(location.getLatitude(), location.getLongitude(), location.getAltitude(), trip.tripId, 3));
                 }
@@ -996,6 +1075,7 @@ public class MapFragment extends Fragment implements LocationListener, SensorEve
             case Sensor.TYPE_LINEAR_ACCELERATION:
                 /*Toast.makeText(requireContext(), "Linear accelerometer: " + sensorEvent.values[0] + ", " +
                         sensorEvent.values[1] + "," + sensorEvent.values[2], Toast.LENGTH_SHORT).show();*/
+                currentAccelerationFromSensor = new AccelerationSensor(sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2]);
                 break;
             case Sensor.TYPE_ROTATION_VECTOR:
                 /*Toast.makeText(requireContext(), "Rotation vector: " + sensorEvent.values[0] + ", " +
